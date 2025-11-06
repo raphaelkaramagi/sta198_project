@@ -1,4 +1,5 @@
 ---
+Names: Varenya Katta, Raphael Karamagi, Tim Jun, Oat Twinvitoo
 title: "testing"
 format: html
 ---
@@ -9,4 +10,5 @@ library(tidyverse)
 
 ```{r}
 insurance <- read.csv("data/medical_insurance.csv")
+names(insurance)
 ```
