@@ -1,0 +1,12 @@
+---
+title: "testing"
+format: html
+---
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+insurance <- read.csv("data/medical_insurance.csv")
+```
