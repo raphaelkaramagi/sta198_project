@@ -12,3 +12,14 @@ library(tidyverse)
 insurance <- read.csv("data/medical_insurance.csv")
 names(insurance)
 ```
+
+```{r}
+insurance <- insurance |> filter(hypertension + diabetes + asthma + copd + cardiovascular_disease + kidney_disease + liver_disease + arthritis + mental_health == 1)
+glimpse(insurance)
+
+mutate(insurance, health = if_else(hypertension == 1, "hypertension", if_else(asthma == 1, "asthma", if_else(copd == 1, "copd", if_else(cardiovascular_disease == 1, "cardiovascular disease", if_else(kidney_disease == 1, "kidney disease", if_else(liver_disease == 1, "liver disease", if_else(arthritis == 1, "arthritis", "mental health"))))))))
+
+#Created new column named health displaying medical conditions of individuals, filtered for individuals with one medical condition only                   
+       
+                                                                          
+```
