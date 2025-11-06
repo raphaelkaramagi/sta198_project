@@ -23,3 +23,27 @@ mutate(insurance, health = if_else(hypertension == 1, "hypertension", if_else(as
        
                                                                           
 ```
+
+```{r}
+#Making average annual premiumn based on smoke status
+insurance |>
+  filter(smoker == "Never") |>
+  summarize(avg_no_smoke_prem = mean(annual_premium, na.rm = TRUE))
+
+insurance |>
+  filter(smoker == "Current") |>
+  summarize(avg_curr_smoke_prem = mean(annual_premium, na.rm = TRUE))
+
+insurance |>
+  filter(smoker == "Former") |>
+  summarize(avg_form_smoke_prem = mean(annual_premium, na.rm = TRUE))
+
+insurance |>
+  group_by(smoker) |>
+  summarize(avg_annual_premium = mean(annual_premium, na.rm = TRUE))
+```
+
+```{r}
+#Ran anova test, next step is to do step down tests
+summary(aov(annual_premium ~ smoker, data=insurance))
+```
