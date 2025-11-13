@@ -38,12 +38,21 @@ insurance |>
   filter(smoker == "Former") |>
   summarize(avg_form_smoke_prem = mean(annual_premium, na.rm = TRUE))
 
-insurance |>
-  group_by(smoker) |>
-  summarize(avg_annual_premium = mean(annual_premium, na.rm = TRUE))
+insurance <- insurance |>
+  mutate(log_annual_premium = log(annual_premium))
 ```
+
 
 ```{r}
 #Ran anova test, next step is to do step down tests
 summary(aov(annual_premium ~ smoker, data=insurance))
+
+t.test(log_annual_premium ~ smoker, 
+       data = insurance |> filter(smoker %in% c('Never', 'Current')))
+
+t.test(log_annual_premium ~ smoker, 
+       data = insurance |> filter(smoker %in% c('Never', 'Former')))
+
+t.test(log_annual_premium ~ smoker, 
+       data = insurance |> filter(smoker %in% c('Former', 'Current')))
 ```
