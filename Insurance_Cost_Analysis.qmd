@@ -1,7 +1,11 @@
 ---
 Names: Varenya Katta, Raphael Karamagi, Tim Jun, Oat Twinvitoo
-title: "testing"
+title: "Insurance Cost Analysis"
 format: html
+
+What proportion of insurance cost variance is attributable to modifiable lifestyle choices versus baseline demographic and socioeconomic risk factors?
+# MODIFIABLE LIFESTYLE: Find relationships between insurance cost and bmi, smoker, alcohol_freq, exercise_frequency, sleep_hours, stress_level
+# BASELINE DEMOGRAPHIC AND SOCIOECONOMIC FACTORS: Find relationships between insurance cost and age, sex, education, income, marital_status, household_size
 ---
 ```{r}
 library(tidyverse)
