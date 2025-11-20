@@ -1,0 +1,12 @@
+---
+Names: Varenya Katta, Raphael Karamagi, Tim Jun, Oat Twinvitoo
+title: "Insurance Cost Analysis"
+format: pdf
+
+---
+```{r, include = FALSE}
+library(tidyverse)
+```
+
+What proportion of insurance cost variance is attributable to modifiable lifestyle choices versus baseline demographic and socioeconomic risk factors?
+
