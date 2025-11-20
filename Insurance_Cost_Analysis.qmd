@@ -1,60 +1,12 @@
 ---
 Names: Varenya Katta, Raphael Karamagi, Tim Jun, Oat Twinvitoo
 title: "Insurance Cost Analysis"
-format: html
+format: pdf
 
 ---
-```{r}
+```{r, include = FALSE}
 library(tidyverse)
 ```
 
 What proportion of insurance cost variance is attributable to modifiable lifestyle choices versus baseline demographic and socioeconomic risk factors?
 
-```{r}
-insurance <- read.csv("data/medical_insurance.csv")
-names(insurance)
-```
-
-```{r}
-insurance <- insurance |> filter(hypertension + diabetes + asthma + copd + cardiovascular_disease + kidney_disease + liver_disease + arthritis + mental_health == 1)
-glimpse(insurance)
-
-mutate(insurance, health = if_else(hypertension == 1, "hypertension", if_else(asthma == 1, "asthma", if_else(copd == 1, "copd", if_else(cardiovascular_disease == 1, "cardiovascular disease", if_else(kidney_disease == 1, "kidney disease", if_else(liver_disease == 1, "liver disease", if_else(arthritis == 1, "arthritis", "mental health"))))))))
-
-#Created new column named health displaying medical conditions of individuals, filtered for individuals with one medical condition only                   
-       
-                                                                          
-```
-
-```{r}
-#Making average annual premiumn based on smoke status
-insurance |>
-  filter(smoker == "Never") |>
-  summarize(avg_no_smoke_prem = mean(annual_premium, na.rm = TRUE))
-
-insurance |>
-  filter(smoker == "Current") |>
-  summarize(avg_curr_smoke_prem = mean(annual_premium, na.rm = TRUE))
-
-insurance |>
-  filter(smoker == "Former") |>
-  summarize(avg_form_smoke_prem = mean(annual_premium, na.rm = TRUE))
-
-insurance <- insurance |>
-  mutate(log_annual_premium = log(annual_premium))
-```
-
-
-```{r}
-#Ran anova test, next step is to do step down tests
-summary(aov(annual_premium ~ smoker, data=insurance))
-
-t.test(log_annual_premium ~ smoker, 
-       data = insurance |> filter(smoker %in% c('Never', 'Current')))
-
-t.test(log_annual_premium ~ smoker, 
-       data = insurance |> filter(smoker %in% c('Never', 'Former')))
-
-t.test(log_annual_premium ~ smoker, 
-       data = insurance |> filter(smoker %in% c('Former', 'Current')))
-```
