@@ -16,8 +16,7 @@ names(insurance)
 What proportion of insurance cost variance is attributable to modifiable lifestyle choices versus baseline demographic and socioeconomic risk factors?
 
 ```{r}
-mutate(insurance, smokerF = smoker.factor)
-mutate(insurance, alcF = alcohol_freq.factor)
-
-
+#Ran a regression for modifiable life choices - might need to switch to glm if assumptions are not met
+m1 <- lm(annual_premium ~ bmi + smoker + alcohol_freq, data=insurance)
+summary(m1)
 ```
