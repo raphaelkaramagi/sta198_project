@@ -15,4 +15,9 @@ names(insurance)
 
 What proportion of insurance cost variance is attributable to modifiable lifestyle choices versus baseline demographic and socioeconomic risk factors?
 
+```{r}
+mutate(insurance, smokerF = smoker.factor)
+mutate(insurance, alcF = alcohol_freq.factor)
 
+
+```
