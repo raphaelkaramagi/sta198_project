@@ -13,6 +13,7 @@ insurance <- read.csv("data/medical_insurance.csv")
 names(insurance)
 ```
 
+
 What proportion of insurance cost variance is attributable to modifiable lifestyle choices versus baseline demographic and socioeconomic risk factors?
 
 ```{r}
@@ -20,3 +21,77 @@ What proportion of insurance cost variance is attributable to modifiable lifesty
 m1 <- lm(annual_premium ~ bmi + smoker + alcohol_freq, data=insurance)
 summary(m1)
 ```
+
+```{r}
+# 1.DATA ANALYSIS
+# View data structure
+glimpse(insurance)
+summary(insurance)
+
+# Check for missing values
+colSums(is.na(insurance))
+```
+
+```{r}
+# 2. UNIVARIATE VISUALIZATIONS
+
+# Distribution of (annual_premium) using a histogram
+ggplot(insurance, aes(x = annual_premium)) +
+  geom_histogram(bins = 30, fill = "lightblue", color = "white", alpha = 0.8) +
+  labs(title = "Distribution of Annual Insurance Premium",
+       x = "Annual Premium ($)",
+       y = "Count") +
+  scale_x_continuous(labels = scales::comma) +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 12, hjust = 0.5),
+        axis.title = element_text(size = 10),
+        panel.grid.minor = element_blank())
+
+# Summary statistics for premium
+summary(insurance$annual_premium)
+
+# visualizations for distributions of modifiable lifestyle factors
+# BMI visual
+ggplot(insurance, aes(x = bmi)) +
+  geom_histogram(bins = 30, fill = "lightblue", color = "white", alpha = 0.8) +
+  labs(title = "Distribution of BMI",
+       x = "Body Mass Index",
+       y = "Count") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 12, hjust = 0.5),
+        axis.title = element_text(size = 10),
+        panel.grid.minor = element_blank())
+
+# Smoking Status
+ggplot(insurance, aes(x = smoker, fill = smoker)) +
+  geom_bar(alpha = 0.8, color = "white") +
+  scale_fill_manual(values = c("Current" = "maroon", 
+                                "Former" = "orange", 
+                                "Never" = "limegreen")) +
+  labs(title = "Distribution of Smoking Status",
+       x = "Smoking Status",
+       y = "Count") +
+  theme_minimal() +
+  theme(legend.position = "none",
+        plot.title = element_text(face = "bold", size = 12, hjust = 0.5),
+        axis.title = element_text(size = 10),
+        panel.grid.minor = element_blank())
+
+# Alcohol Frequency
+ggplot(insurance, aes(x = alcohol_freq, fill = alcohol_freq)) +
+  geom_bar(alpha = 0.8, color = "white") +
+  scale_fill_manual(values = c("Daily" = "maroon", 
+                                "None" = "limegreen", 
+                                "Occasionally" = "orange", 
+                                "Weekly" = "violet")) +
+  labs(title = "Distribution of Alcohol Consumption Frequency",
+       x = "Alcohol Frequency",
+       y = "Count") +
+  theme_minimal() +
+  theme(legend.position = "none",
+        plot.title = element_text(face = "bold", size = 12, hjust = 0.5),
+        axis.title = element_text(size = 10),
+        panel.grid.minor = element_blank())
+
+```
+
