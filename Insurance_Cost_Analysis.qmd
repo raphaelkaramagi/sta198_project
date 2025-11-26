@@ -122,3 +122,46 @@ ggplot(insurance, aes(x = smoker, y = annual_premium, fill = smoker)) +
   )
 ```
 Figure [X] displays the distribution of annual insurance premiums across smoking status categories. The violin plots reveal substantial differences in premium distributions among the three groups. Current smokers demonstrate notably elevated premiums with a median around $1,200 and considerable variability extending to over $1,500 for the upper quartile. Former smokers show an intermediate distribution, with lower median premiums than current smokers but higher than never-smokers. Never-smokers exhibit the lowest and most concentrated premium distribution, with the majority of observations clustering below $1,000. The pronounced vertical separation between groups—particularly between current smokers and never-smokers—provides preliminary visual evidence that smoking status, a modifiable lifestyle factor, is strongly associated with insurance costs. The overlapping distributions suggest some shared variance with other factors, which will be explored through formal variance partitioning analysis.
+
+```{r}
+# regression model stuff
+
+#Modifiable lifestyle factors only
+m1 <- lm(annual_premium ~ bmi + smoker + alcohol_freq, data = insurance)
+
+#Baseline demographic/socioeconomic factors only
+m2 <- lm(annual_premium ~ age + sex + education + income + 
+         marital_status + household_size, data = insurance)
+
+#Full model (both modifiable and baseline factors)
+m3 <- lm(annual_premium ~ bmi + smoker + alcohol_freq + age + sex + 
+         education + income + marital_status + household_size, data = insurance)
+
+#Full model with interaction (BMI * smoker)
+m4 <- lm(annual_premium ~ bmi * smoker + alcohol_freq + age + sex + 
+         education + income + marital_status + household_size, data = insurance)
+
+#Display model summaries
+cat("\n=== MODEL 1: Modifiable Factors Only ===\n")
+summary(m1)
+
+cat("\n=== MODEL 2: Baseline Factors Only ===\n")
+summary(m2)
+
+cat("\n=== MODEL 3: Full Model ===\n")
+summary(m3)
+
+cat("\n=== MODEL 4: Full Model + Interaction ===\n")
+summary(m4)
+```
+We fit four linear regression models to examine how modifiable lifestyle factors and baseline demographic characteristics relate to insurance premiums. Model 1 included only modifiable factors (BMI, smoking status, alcohol frequency), Model 2 included only baseline factors (age, sex, education, income, marital status, household size), Model 3 combined both sets of predictors, and Model 4 added a BMI by smoking interaction term.
+
+Model 1 explained 2.6% of premium variance and was statistically significant (F = 448.3, p < 0.001). Smoking status was the strongest predictor. Compared to current smokers, former smokers paid $141 less annually and never smokers paid $192 less (both p < 0.001), representing roughly 20 to 26% lower premiums. BMI showed a positive association, with each unit increase linked to a $3.43 premium increase (p < 0.001). Alcohol consumption was not significantly related to premiums at any level (all p > 0.15).
+
+Model 2 explained only 1.6% of premium variance. Age was the strongest baseline predictor, with each year associated with a $3.19 premium increase (p < 0.001). Income showed a small negative effect (p = 0.032), while sex, marital status, and household size were not significant.
+
+Model 3 combined all predictors and explained 4.3% of variance, nearly the sum of Models 1 and 2. Key predictors maintained stable effect sizes. Smoking coefficients were nearly identical to Model 1 (former: $141 less, never: $194 less, both p < 0.001), as were BMI and age effects. This stability suggests minimal confounding between modifiable and baseline factors.
+
+Model 4 tested for BMI by smoking interactions but explained virtually the same variance as Model 3 (4.29% vs 4.27%). The interaction terms were not significant (p = 0.42 and p = 0.50), indicating the relationship between BMI and premiums does not differ across smoking groups. We therefore selected Model 3 as our final model.
+
+The low R-squared values across all models (1.6% to 4.3%) indicate that most premium variance is unexplained by measured predictors. This likely reflects unmeasured factors such as coverage type, deductibles, policy terms, or company-specific pricing. However, the significant effects of modifiable factors, particularly smoking status, demonstrate that lifestyle choices contribute meaningfully to premium determination.
