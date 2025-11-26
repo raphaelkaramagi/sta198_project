@@ -33,7 +33,7 @@ colSums(is.na(insurance))
 ```
 
 ```{r}
-# 2. UNIVARIATE VISUALIZATIONS
+# univariate visualizations
 
 # Distribution of (annual_premium) using a histogram
 ggplot(insurance, aes(x = annual_premium)) +
@@ -95,3 +95,30 @@ ggplot(insurance, aes(x = alcohol_freq, fill = alcohol_freq)) +
 
 ```
 
+```{r}
+ggplot(insurance, aes(x = smoker, y = annual_premium, fill = smoker)) +
+  geom_violin(alpha = 0.6, color = "white") +
+  geom_boxplot(width = 0.2, alpha = 0.8, color = "white", outlier.alpha = 0.5) +
+  scale_fill_manual(values = c("Current" = "maroon", 
+                                "Former" = "orange", 
+                                "Never" = "limegreen")) +
+  scale_y_continuous(
+    labels = scales::comma,
+    breaks = seq(0, 10000, 2000),
+    expand = c(0, 0.02)
+  ) +
+  labs(title = "Insurance Premium by Smoking Status",
+       subtitle = "Showing the primary effect of smoking on premiums",
+       x = "Smoking Status",
+       y = "Annual Premium ($)") +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(face = "bold", size = 12, hjust = 0.5),
+    plot.subtitle = element_text(size = 10, hjust = 0.5),
+    axis.title = element_text(size = 10),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank()
+  )
+```
+Figure [X] displays the distribution of annual insurance premiums across smoking status categories. The violin plots reveal substantial differences in premium distributions among the three groups. Current smokers demonstrate notably elevated premiums with a median around $1,200 and considerable variability extending to over $1,500 for the upper quartile. Former smokers show an intermediate distribution, with lower median premiums than current smokers but higher than never-smokers. Never-smokers exhibit the lowest and most concentrated premium distribution, with the majority of observations clustering below $1,000. The pronounced vertical separation between groups—particularly between current smokers and never-smokers—provides preliminary visual evidence that smoking status, a modifiable lifestyle factor, is strongly associated with insurance costs. The overlapping distributions suggest some shared variance with other factors, which will be explored through formal variance partitioning analysis.
