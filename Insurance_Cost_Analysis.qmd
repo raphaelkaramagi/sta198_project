@@ -96,6 +96,27 @@ ggplot(insurance, aes(x = alcohol_freq, fill = alcohol_freq)) +
 ```
 
 ```{r}
+# BIVARIATE STATISTICAL TESTS
+
+# BMI correlation with premium
+cat("\n Correlation Test: BMI vs Annual Premium \n")
+cor_test_bmi <- cor.test(insurance$bmi, insurance$annual_premium)
+print(cor_test_bmi)
+
+# ANOVA for Smoking Status
+cat("\n ANOVA: Smoking Status vs Annual Premium \n")
+anova_smoking <- aov(annual_premium ~ smoker, data = insurance)
+print(summary(anova_smoking))
+
+# ANOVA for Alcohol Frequency
+cat("\n ANOVA: Alcohol Frequency vs Annual Premium \n")
+anova_alcohol <- aov(annual_premium ~ alcohol_freq, data = insurance)
+print(summary(anova_alcohol))
+```
+Initial bivariate analyses revealed differential relationships between modifiable lifestyle factors and annual insurance premiums. BMI demonstrated a statistically significant but weak positive correlation with premium costs (r = 0.042, 95% CI [0.035, 0.048], p < 0.001), suggesting that BMI alone explains minimal variance in insurance costs. In contrast, smoking status showed a substantial and highly significant association with premiums (F(2, 99997) = 1247, p < 0.001), indicating meaningful differences in insurance costs across smoking categories. Notably, alcohol consumption frequency was not significantly associated with premium costs (F(3, 99996) = 0.597, p = 0.617), suggesting that alcohol use patterns do not independently predict insurance premiums in this sample. These preliminary findings suggest that while smoking status is a strong univariate predictor of insurance costs, the relationship between BMI and premiums may be more complex and potentially moderated by other factors, warranting multivariate analysis to account for confounding variables and interactions.
+
+
+```{r}
 ggplot(insurance, aes(x = smoker, y = annual_premium, fill = smoker)) +
   geom_violin(alpha = 0.6, color = "white") +
   geom_boxplot(width = 0.2, alpha = 0.8, color = "white", outlier.alpha = 0.5) +
@@ -121,6 +142,7 @@ ggplot(insurance, aes(x = smoker, y = annual_premium, fill = smoker)) +
     panel.grid.major.x = element_blank()
   )
 ```
+
 Figure [X] displays the distribution of annual insurance premiums across smoking status categories. The violin plots reveal substantial differences in premium distributions among the three groups. Current smokers demonstrate notably elevated premiums with a median around $1,200 and considerable variability extending to over $1,500 for the upper quartile. Former smokers show an intermediate distribution, with lower median premiums than current smokers but higher than never-smokers. Never-smokers exhibit the lowest and most concentrated premium distribution, with the majority of observations clustering below $1,000. The pronounced vertical separation between groups—particularly between current smokers and never-smokers—provides preliminary visual evidence that smoking status, a modifiable lifestyle factor, is strongly associated with insurance costs. The overlapping distributions suggest some shared variance with other factors, which will be explored through formal variance partitioning analysis.
 
 ```{r}
@@ -142,16 +164,16 @@ m4 <- lm(annual_premium ~ bmi * smoker + alcohol_freq + age + sex +
          education + income + marital_status + household_size, data = insurance)
 
 #Display model summaries
-cat("\n=== MODEL 1: Modifiable Factors Only ===\n")
+cat("\n MODEL 1: Modifiable Factors Only \n")
 summary(m1)
 
-cat("\n=== MODEL 2: Baseline Factors Only ===\n")
+cat("\n MODEL 2: Baseline Factors Only \n")
 summary(m2)
 
-cat("\n=== MODEL 3: Full Model ===\n")
+cat("\n MODEL 3: Full Model \n")
 summary(m3)
 
-cat("\n=== MODEL 4: Full Model + Interaction ===\n")
+cat("\n MODEL 4: Full Model + Interaction \n")
 summary(m4)
 ```
 We fit four linear regression models to examine how modifiable lifestyle factors and baseline demographic characteristics relate to insurance premiums. Model 1 included only modifiable factors (BMI, smoking status, alcohol frequency), Model 2 included only baseline factors (age, sex, education, income, marital status, household size), Model 3 combined both sets of predictors, and Model 4 added a BMI by smoking interaction term.
@@ -165,3 +187,89 @@ Model 3 combined all predictors and explained 4.3% of variance, nearly the sum o
 Model 4 tested for BMI by smoking interactions but explained virtually the same variance as Model 3 (4.29% vs 4.27%). The interaction terms were not significant (p = 0.42 and p = 0.50), indicating the relationship between BMI and premiums does not differ across smoking groups. We therefore selected Model 3 as our final model.
 
 The low R-squared values across all models (1.6% to 4.3%) indicate that most premium variance is unexplained by measured predictors. This likely reflects unmeasured factors such as coverage type, deductibles, policy terms, or company-specific pricing. However, the significant effects of modifiable factors, particularly smoking status, demonstrate that lifestyle choices contribute meaningfully to premium determination.
+
+```{r}
+# Sample characteristics
+cat("\n SAMPLE CHARACTERISTICS \n")
+cat(sprintf("Total observations: %d\n", nrow(insurance)))
+cat(sprintf("Complete cases: %d\n", sum(complete.cases(insurance))))
+
+# Formal model comparison tests
+cat("\n FORMAL MODEL COMPARISONS \n")
+
+# Test 1: Does adding modifiable factors improve baseline model?
+cat("\nTest 1: Baseline Model (M2) vs Full Model (M3)\n")
+cat("Question: Do modifiable factors add significant explanatory power?\n\n")
+anova_m2_m3 <- anova(m2, m3)
+print(anova_m2_m3)
+
+# Test 2: Does adding baseline factors improve modifiable model?
+cat("\nTest 2: Modifiable Model (M1) vs Full Model (M3)\n")
+cat("Question: Do baseline factors add significant explanatory power?\n\n")
+anova_m1_m3 <- anova(m1, m3)
+print(anova_m1_m3)
+
+# Test 3: Is the interaction term significant?
+cat("\nTest 3: Full Model (M3) vs Full + Interaction (M4)\n")
+cat("Question: Is the BMI × Smoking interaction statistically significant?\n\n")
+anova_m3_m4 <- anova(m3, m4)
+print(anova_m3_m4)
+
+# Model selection criteria
+cat("\n MODEL SELECTION CRITERIA \n")
+model_comparison <- data.frame(
+  Model = c("Modifiable Only", "Baseline Only", "Full Model", "Full + Interaction"),
+  AIC = c(AIC(m1), AIC(m2), AIC(m3), AIC(m4)),
+  BIC = c(BIC(m1), BIC(m2), BIC(m3), BIC(m4)),
+  R_squared = c(summary(m1)$r.squared, summary(m2)$r.squared, 
+                summary(m3)$r.squared, summary(m4)$r.squared),
+  Adj_R_squared = c(summary(m1)$adj.r.squared, summary(m2)$adj.r.squared,
+                    summary(m3)$adj.r.squared, summary(m4)$adj.r.squared)
+)
+print(model_comparison)
+
+```
+Formal model comparison tests using ANOVA and information criteria consistently identified the full model (M3) incorporating both modifiable lifestyle factors and baseline demographic/socioeconomic variables as the optimal specification. The addition of modifiable factors (BMI, smoking status, alcohol frequency) to the baseline model significantly improved model fit (F(6, 99980) = 461.37, p < 0.001), while baseline factors also provided significant incremental explanatory power beyond modifiable factors alone (F(13, 99980) = 134.32, p < 0.001). However, the BMI × smoking interaction term did not significantly improve model fit (F(2, 99978) = 0.33, p = 0.719), suggesting that the relationship between BMI and premiums does not meaningfully differ across smoking categories. Model selection criteria further support the full model without interaction as the preferred specification: the full model exhibited the lowest AIC (1,477,528) and BIC (1,477,727), with R² = 0.043 indicating that modifiable and baseline factors combined explain 4.3% of variance in insurance premiums. While the Full + Interaction model showed negligibly similar R² (0.043), the lack of statistical significance coupled with higher AIC/BIC values due to increased model complexity argues against its inclusion. These results demonstrate that both modifiable lifestyle choices and demographic characteristics independently contribute to insurance premium variation, justifying a comprehensive modeling approach that accounts for both factor sets.
+
+```{r}
+# Calculate proportions of explianed variance only (4.3% of total variance)
+total_explained <- rsq_full
+prop_modifiable <- variance_modifiable_unique / total_explained
+prop_baseline <- variance_baseline_unique / total_explained
+prop_shared <- variance_overlap / total_explained
+
+cat("Of the explained variance:\n")
+cat("Modifiable:", prop_modifiable * 100, "%\n")
+cat("Baseline:", prop_baseline * 100, "%\n")
+cat("Shared:", prop_shared * 100, "%\n")
+
+# Create visualization
+variance_data_explained <- data.frame(
+  Component = factor(c("Modifiable\n(Unique)", "Baseline\n(Unique)", "Shared"),
+                     levels = c("Modifiable\n(Unique)", "Baseline\n(Unique)", "Shared")),
+  Percentage = c(
+    prop_modifiable * 100,
+    prop_baseline * 100,
+    prop_shared * 100
+  )
+)
+
+ggplot(variance_data_explained, aes(x = "", y = Percentage, fill = Component)) +
+  geom_bar(stat = "identity", width = 1, color = "white", linewidth = 1) +
+  coord_polar("y", start = 0) +
+  scale_fill_manual(values = c("Modifiable\n(Unique)" = "lightblue",
+                                "Baseline\n(Unique)" = "maroon",
+                                "Shared" = "orange")) +
+  labs(title = "Variance Partitioning: Explained Variance Only",
+       subtitle = "Of the 4.3% explained variance, what proportion is modifiable vs. baseline?",
+       fill = "") +
+  theme_void() +
+  theme(plot.title = element_text(face = "bold", size = 12, hjust = 0.5),
+        plot.subtitle = element_text(size = 10, hjust = 0.5, margin = margin(b = 20))) +
+  geom_text(aes(label = sprintf("%.1f%%", Percentage)), 
+            position = position_stack(vjust = 0.5),
+            size = 4, fontface = "bold")
+```
+
+Individual-level characteristics explained only 4.3% of total premium variance, which makes sense given that insurance pricing is heavily influenced by policy structure and market factors. To answer our research question, we looked at how this 4.3% breaks down between modifiable and baseline factors. Figure X shows that among the variance we could explain with individual characteristics, modifiable lifestyle factors accounted for 61.8% while baseline demographic factors accounted for 39.0%. The two sets of predictors showed almost no overlap (about 1%), meaning modifiable and baseline factors work mostly independently in determining premiums. This shows that when it comes to the individual characteristics that do matter for premiums, lifestyle choices are much more important than things like age or sex that people cannot change. These findings are relevant for insurers designing pricing models and for individuals who want to lower their healthcare costs by changing their lifestyle habits.
+
