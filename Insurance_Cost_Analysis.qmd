@@ -232,7 +232,7 @@ ggplot(insurance, aes(x = smoker, y = annual_premium, fill = smoker)) +
   )
 ```
 
-Figure [X] displays the distribution of annual insurance premiums across smoking status categories. The violin plots reveal substantial differences in premium distributions among the three groups. Current smokers demonstrate notably elevated premiums with a median around $1,200 and considerable variability extending to over $1,500 for the upper quartile. Former smokers show an intermediate distribution, with lower median premiums than current smokers but higher than never-smokers. Never-smokers exhibit the lowest and most concentrated premium distribution, with the majority of observations clustering below $1,000. The pronounced vertical separation between groups—particularly between current smokers and never-smokers—provides preliminary visual evidence that smoking status, a modifiable lifestyle factor, is strongly associated with insurance costs. The overlapping distributions suggest some shared variance with other factors, which will be explored through formal variance partitioning analysis.
+Figure [X] displays the distribution of annual insurance premiums across smoking status categories. The violin plots reveal substantial differences in premium distributions among the three groups. Current smokers demonstrate notably elevated premiums with a median around 1,200 USD and considerable variability extending to over 1,500 USD for the upper quartile. Former smokers show an intermediate distribution, with lower median premiums than current smokers but higher than never-smokers. Never-smokers exhibit the lowest and most concentrated premium distribution, with the majority of observations clustering below 1,000 USD. The pronounced vertical separation between groups—particularly between current smokers and never-smokers—provides preliminary visual evidence that smoking status, a modifiable lifestyle factor, is strongly associated with insurance costs. The overlapping distributions suggest some shared variance with other factors, which will be explored through formal variance partitioning analysis.
 
 ```{r}
 # regression model stuff
@@ -276,6 +276,16 @@ Model 3 combined all predictors and explained 4.3% of variance, nearly the sum o
 Model 4 tested for BMI by smoking interactions but explained virtually the same variance as Model 3 (4.29% vs 4.27%). The interaction terms were not significant (p = 0.42 and p = 0.50), indicating the relationship between BMI and premiums does not differ across smoking groups. We therefore selected Model 3 as our final model.
 
 The low R-squared values across all models (1.6% to 4.3%) indicate that most premium variance is unexplained by measured predictors. This likely reflects unmeasured factors such as coverage type, deductibles, policy terms, or company-specific pricing. However, the significant effects of modifiable factors, particularly smoking status, demonstrate that lifestyle choices contribute meaningfully to premium determination.
+
+```{r}
+ggplot(insurance, aes(x = age, y = annual_premium)) +
+  geom_point() + 
+    labs(title = "Annual Premium and Age of Subjects",
+       x = "Age (years)",
+       y = "Annual Premium ($)") 
+```
+Linear association between age and annual premium can be observed. This plot does not controll for other variables.
+
 
 ```{r}
 # Sample characteristics
