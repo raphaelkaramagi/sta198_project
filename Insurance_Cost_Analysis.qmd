@@ -18,9 +18,9 @@ What proportion of insurance cost variance is attributable to modifiable lifesty
 
 ```{r}
 #Ran a regression for modifiable life choices - might need to switch to glm if assumptions are not met
-mM <- lm(annual_premium ~ bmi + smoker + alcohol_freq, data=insurance)
+mM <- glm(annual_premium ~ bmi + smoker + alcohol_freq, data=insurance)
 summary(mM)
-mB <- lm(annual_premium ~ age + sex + education + income + marital_status + household_size, data=insurance)
+mB <- glm(annual_premium ~ age + sex + education + income + marital_status + household_size, data=insurance)
 summary(mB)
 ```
 ```{r}
@@ -185,18 +185,18 @@ Figure [X] displays the distribution of annual insurance premiums across smoking
 # regression model stuff
 
 #Modifiable lifestyle factors only
-m1 <- lm(annual_premium ~ bmi + smoker + alcohol_freq, data = insurance)
+m1 <- glm(annual_premium ~ bmi + smoker + alcohol_freq, data = insurance)
 
 #Baseline demographic/socioeconomic factors only
-m2 <- lm(annual_premium ~ age + sex + education + income + 
+m2 <- glm(annual_premium ~ age + sex + education + income + 
          marital_status + household_size, data = insurance)
 
 #Full model (both modifiable and baseline factors)
-m3 <- lm(annual_premium ~ bmi + smoker + alcohol_freq + age + sex + 
+m3 <- glm(annual_premium ~ bmi + smoker + alcohol_freq + age + sex + 
          education + income + marital_status + household_size, data = insurance)
 
 #Full model with interaction (BMI * smoker)
-m4 <- lm(annual_premium ~ bmi * smoker + alcohol_freq + age + sex + 
+m4 <- glm(annual_premium ~ bmi * smoker + alcohol_freq + age + sex + 
          education + income + marital_status + household_size, data = insurance)
 
 #Display model summaries
