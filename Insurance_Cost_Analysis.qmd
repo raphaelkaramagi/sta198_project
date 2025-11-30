@@ -6,6 +6,7 @@ format: pdf
 ---
 ```{r, include = FALSE}
 library(tidyverse)
+library(ggplot2)
 ```
 
 ```{r}
@@ -13,11 +14,10 @@ insurance <- read.csv("data/medical_insurance.csv")
 names(insurance)
 ```
 
-
-What proportion of insurance cost variance is attributable to modifiable lifestyle choices versus baseline demographic and socioeconomic risk factors?
+Research Question: What proportion of insurance cost variance is attributable to modifiable lifestyle choices versus baseline demographic and socioeconomic risk factors?
 
 ```{r}
-#Ran a regression for modifiable life choices - might need to switch to glm if assumptions are not met
+#Ran a regression for modifiable life choices; code has been switched to glm as assumptions are not met
 mM <- glm(annual_premium ~ bmi + smoker + alcohol_freq, data=insurance)
 summary(mM)
 mB <- glm(annual_premium ~ age + sex + education + income + marital_status + household_size, data=insurance)
@@ -34,6 +34,15 @@ ggplot(data.frame(fitted = fitted(mM), residuals = residuals(mM)),
 ggplot(data.frame(sample = residuals(mM)), aes(sample = sample)) +
   stat_qq(color = "black") +
   stat_qq_line(color = "red", linetype = "dashed") +
+  labs(title = "Q-Q Plot for baseline factors",
+       x = "Theoretical Quantiles", y = "Sample Quantiles")
+ggplot(data = mM, mapping = aes(x = mM$residuals)) +
+  geom_histogram(color = "black") 
+  labs(title = "Histogram of Residuals",
+       x = "Residual", y = "Count")
+ggplot(data.frame(sample = residuals(mM)), aes(sample = sample)) +
+  stat_qq(color = "black") +
+  stat_qq_line(color = "red", linetype = "dashed") +
   labs(title = "Q-Q Plot for modifiable lifestyle choices",
        x = "Theoretical Quantiles", y = "Sample Quantiles")
 
@@ -43,6 +52,10 @@ ggplot(data.frame(fitted = fitted(mB), residuals = residuals(mB)),
   geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
   labs(title = "Residuals vs Fitted for baseline factors",
        x = "Fitted Values", y = "Residuals")
+ggplot(data = mB, mapping = aes(x = mB$residuals)) +
+  geom_histogram(color = "black") 
+  labs(title = "Histogram of Residuals",
+       x = "Residual", y = "Count")
 ggplot(data.frame(sample = residuals(mB)), aes(sample = sample)) +
   stat_qq(color = "black") +
   stat_qq_line(color = "red", linetype = "dashed") +
@@ -162,9 +175,38 @@ ggplot(insurance, aes(x = smoker, y = annual_premium, fill = smoker)) +
   scale_y_continuous(
     labels = scales::comma,
     breaks = seq(0, 10000, 2000),
-    expand = c(0, 0.02)
+    expand = c(0, 0.02),
+    limits = c(0, 11000)
   ) +
   labs(title = "Insurance Premium by Smoking Status",
+       subtitle = "Showing the primary effect of smoking on premiums",
+       x = "Smoking Status",
+       y = "Annual Premium ($)") +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(face = "bold", size = 12, hjust = 0.5),
+    plot.subtitle = element_text(size = 10, hjust = 0.5),
+    axis.title = element_text(size = 10),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank()
+  )
+
+## As earlier plot may be difficult to see, we create a second plot where limits from 0 to 2000. This removes 1294 of the 100,000 rows included in this dataset. Most key features of the plot is retained. 
+
+ggplot(insurance, aes(x = smoker, y = annual_premium, fill = smoker)) +
+  geom_violin(alpha = 0.6, color = "white") +
+  geom_boxplot(width = 0.2, alpha = 0.8, color = "white", outlier.alpha = 0.5) +
+  scale_fill_manual(values = c("Current" = "maroon", 
+                                "Former" = "orange", 
+                                "Never" = "limegreen")) +
+  scale_y_continuous(
+    labels = scales::comma,
+    breaks = seq(0, 10000, 2000),
+    expand = c(0, 0.02),
+    limits = c(0, 2000)
+  ) +
+  labs(title = "Insurance Premium by Smoking Status (0 < Annual Premium < 2000)",
        subtitle = "Showing the primary effect of smoking on premiums",
        x = "Smoking Status",
        y = "Annual Premium ($)") +
