@@ -14,6 +14,13 @@ insurance <- read.csv("data/medical_insurance.csv")
 names(insurance)
 ```
 
+## Introduction
+
+In the United States, health insurance comes at a hefty price, and this price keeps on increasing. Just within the year 2023, healthcare spending increased by 7.5%, totaling up to 4.9 trillion dollars (ama). In turn, insurance premiums keep going up, making it harder for individuals to comfortably afford health insurance. It is known that health insurance costs aren't the same for everyone; if one's risk of needing healthcare is greater, than their premium is most likely going to cost more. Insurance companies use various predictors to determine a consumer's premium, but these factors can be split into two groups: modifiable lifestyle choices and baseline demographic/socioeconomic factors. This study seeks to figure out what proportion of insurance cost variance is attributable to modifiable lifestyle choices versus baseline demographic and socioeconomic risk factors. Being able to see these results can inform the public on the factors they should be paying attention to if they want to lower their premiums. For example, if insurance cost variance is heavily driven by modifiable lifestyle choices such as smoking or alcohol consumption, prices are determined heavily on the behaviors of the customer. However, if the insurance cost variance is more controlled by the socioeconomic factors, then there must be a change in the system in order to lower costs. 
+
+For the specific variables considered, within modifiable lifestyle choices, there is smoking status (current, former, or never), frequency of alcohol consumption (Never, occasionally, weekly, daily), and BMI. As for the baseline demographic/socioeconomic factors category, it contains age, sex, highest education level, income, marital status, and household size. The dataset containing all of these variables was obtained from Kaggle; the Kaggle dataset got it's data from 3 main sources: Centers for Disease Control and Prevention (CDC), U.S. Department of Health & Human Services (HHS), and Centers for Medicare & Medicaid Services (CMS). In the scope of our research question, the dataset contained an excess amount of information; thus, those columns were filtered out and we only looked at the variables apart of the two main categories. Throughout the paper, we will run regressions and visualize the data in order to see how the two categories influence the variance of medical insurance costs. 
+
+
 Research Question: What proportion of insurance cost variance is attributable to modifiable lifestyle choices versus baseline demographic and socioeconomic risk factors?
 
 ```{r}
