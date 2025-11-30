@@ -18,9 +18,9 @@ Research Question: What proportion of insurance cost variance is attributable to
 
 ```{r}
 #Ran a regression for modifiable life choices; code has been switched to glm as assumptions are not met
-mM <- glm(annual_premium ~ bmi + smoker + alcohol_freq, data=insurance)
+mM <- lm(annual_premium ~ bmi + smoker + alcohol_freq, data=insurance)
 summary(mM)
-mB <- glm(annual_premium ~ age + sex + education + income + marital_status + household_size, data=insurance)
+mB <- lm(annual_premium ~ age + sex + education + income + marital_status + household_size, data=insurance)
 summary(mB)
 ```
 ```{r}
@@ -39,7 +39,7 @@ ggplot(data.frame(sample = residuals(mM)), aes(sample = sample)) +
 ggplot(data = mM, mapping = aes(x = mM$residuals)) +
   geom_histogram(color = "black") 
   labs(title = "Histogram of Residuals",
-       x = "Residual", y = "Count")
+       x = "Residual", y = "Count") 
 ggplot(data.frame(sample = residuals(mM)), aes(sample = sample)) +
   stat_qq(color = "black") +
   stat_qq_line(color = "red", linetype = "dashed") +
@@ -62,7 +62,18 @@ ggplot(data.frame(sample = residuals(mB)), aes(sample = sample)) +
   labs(title = "Q-Q Plot for baseline factors",
        x = "Theoretical Quantiles", y = "Sample Quantiles")
 ```
-From the assumptions graph, it is evident that the assumption for a linear fit are broken because variance is not constant and the residuals don't seem to be linear; thus, we should use a general linear fit instead.
+
+For linear regression to be used, it must fufill 4 requirements: 1) linearity in the parameters 2) constant variance of the errors 3) errors follow normal distribution 4) errors are independent. 
+
+Linearity: As observations are not distributed symmetrically about the y axis, it can be inferred that the assumption that linearity exists in the parameters is not fulfilled.
+
+Constant variance of errors: as the residuals are not spaced out evenly (vertically), it can also be said that the variance of the errors is not constant. 
+
+Normal distribution of errors: The histogram of residuals is clearly right skewed, indicating that the errors are not normally distributed. 
+
+Independent Errors: As data is collected from a variety of sources, it is difficult to draw a conclusion here.
+
+As linearity, constant variance of errors and normal distribution of errors is violated, we should use a generalized linear model (glm) rather than a linear model when working with this data.
 
 ```{r}
 mMgen <- glm(annual_premium ~ bmi + smoker + alcohol_freq, data=insurance, family = "Gamma")
