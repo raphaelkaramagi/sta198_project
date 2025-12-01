@@ -20,6 +20,8 @@ In the United States, health insurance costs rank amongst the highest in the wor
 
 Consequently, various factors may contribute to the cost of one's premium. However, these factors may be split into two groups: modifiable lifestyle choices and baseline demographic/socioeconomic factors. This study seeks to figure out what proportion of insurance cost variance is attributable to modifiable lifestyle choices versus baseline demographic and socioeconomic risk factors. Being able to see these results can inform the public on the factors they should be paying attention to if they want to lower their premiums. For example, if insurance cost variance is heavily driven by modifiable lifestyle choices such as smoking or alcohol consumption, prices are determined heavily on the behaviors of the customer. However, if the insurance cost variance is more controlled by the socioeconomic factors, then there must be a change in the system in order to lower costs.
 
+It is known that an individual's premium is determined by their risk score; what goes into the calculation of a risk score and their weights contributing to the risk score can get more complex. According to the health care law, insurance companies can only use five factors to determine health insurance premiums: age, location, tobacco use, individual vs. family enrollment, and type of plan (healthcare). For example, it is known that the average elderly individual paid three times more for health insurance compared to the average working age adult (bls). However, there could be underlying factors that could go into one's risk score. For instance, getting company-sponsored health insurance can present incentives by participating in workplace wellness programs, which could mean other factors could sway premiums (KFF). A lot of previous findings present how individual factors can affect health insurance costs; the gap we are trying to bridge is to find how much premium prices can be attributed by baseline demographic/socioeconomic factors versus modifiable lifestyle factors. 
+
 For the specific variables considered, within modifiable lifestyle choices, there is smoking status (current, former, or never), frequency of alcohol consumption (Never, occasionally, weekly, daily), and BMI. As for the baseline demographic/socioeconomic factors category, it contains age, sex, highest education level, income, marital status, and household size. The dataset containing all of these variables was obtained from Kaggle; the Kaggle dataset got it's data from 3 main sources: Centers for Disease Control and Prevention (CDC), U.S. Department of Health & Human Services (HHS), and Centers for Medicare & Medicaid Services (CMS). In the scope of our research question, the dataset contained an excess amount of information; thus, those columns were filtered out and we only looked at the variables apart of the two main categories. Throughout the paper, we will run regressions and visualize the data in order to see how the two categories influence the variance of medical insurance costs. 
 
 Research Question: What proportion of insurance cost variance is attributable to modifiable lifestyle choices versus baseline demographic and socioeconomic risk factors?
@@ -362,42 +364,42 @@ Formal model comparison tests using ANOVA and information criteria consistently 
 
 ```{r}
 # Calculate proportions of explianed variance only (4.3% of total variance)
-#total_explained <- rsq_full
-#prop_modifiable <- variance_modifiable_unique / total_explained
-#prop_baseline <- variance_baseline_unique / total_explained
-#prop_shared <- variance_overlap / total_explained
+total_explained <- rsq_full
+prop_modifiable <- variance_modifiable_unique / total_explained
+prop_baseline <- variance_baseline_unique / total_explained
+prop_shared <- variance_overlap / total_explained
 
-#cat("Of the explained variance:\n")
-#cat("Modifiable:", prop_modifiable * 100, "%\n")
-#cat("Baseline:", prop_baseline * 100, "%\n")
-#cat("Shared:", prop_shared * 100, "%\n")
+cat("Of the explained variance:\n")
+cat("Modifiable:", prop_modifiable * 100, "%\n")
+cat("Baseline:", prop_baseline * 100, "%\n")
+cat("Shared:", prop_shared * 100, "%\n")
 
 # Create visualization
-#variance_data_explained <- data.frame(
-#  Component = factor(c("Modifiable\n(Unique)", "Baseline\n(Unique)", "Shared"),
-#                     levels = c("Modifiable\n(Unique)", "Baseline\n(Unique)", "Shared")),
-#  Percentage = c(
-#    prop_modifiable * 100,
-#    prop_baseline * 100,
-#    prop_shared * 100
-#  )
-#)
+variance_data_explained <- data.frame(
+  Component = factor(c("Modifiable\n(Unique)", "Baseline\n(Unique)", "Shared"),
+                     levels = c("Modifiable\n(Unique)", "Baseline\n(Unique)", "Shared")),
+  Percentage = c(
+    prop_modifiable * 100,
+    prop_baseline * 100,
+    prop_shared * 100
+  )
+)
 
-#ggplot(variance_data_explained, aes(x = "", y = Percentage, fill = Component)) +
-#  geom_bar(stat = "identity", width = 1, color = "white", linewidth = 1) +
-#  coord_polar("y", start = 0) +
-# scale_fill_manual(values = c("Modifiable\n(Unique)" = "lightblue",
-#                                "Baseline\n(Unique)" = "maroon",
-#                                "Shared" = "orange")) +
-#  labs(title = "Variance Partitioning: Explained Variance Only",
-#       subtitle = "Of the 4.3% explained variance, what proportion is modifiable vs. baseline?",
-#       fill = "") +
-#  theme_void() + 
-#  theme(plot.title = element_text(face = "bold", size = 12, hjust = 0.5),
-#        plot.subtitle = element_text(size = 10, hjust = 0.5, margin = margin(b = 20))) +
-#  geom_text(aes(label = sprintf("%.1f%%", Percentage)), 
-#            position = position_stack(vjust = 0.5),
-#            size = 4, fontface = "bold")
+ggplot(variance_data_explained, aes(x = "", y = Percentage, fill = Component)) +
+  geom_bar(stat = "identity", width = 1, color = "white", linewidth = 1) +
+  cord_polar("y", start = 0) +
+ scale_fill_manual(values = c("Modifiable\n(Unique)" = "lightblue",
+                                "Baseline\n(Unique)" = "maroon",
+                                "Shared" = "orange")) +
+  labs(title = "Variance Partitioning: Explained Variance Only",
+       subtitle = "Of the 4.3% explained variance, what proportion is modifiable vs. baseline?",
+       fill = "") +
+  theme_void() + 
+  theme(plot.title = element_text(face = "bold", size = 12, hjust = 0.5),
+        plot.subtitle = element_text(size = 10, hjust = 0.5, margin = margin(b = 20))) +
+  geom_text(aes(label = sprintf("%.1f%%", Percentage)), 
+            position = position_stack(vjust = 0.5),
+            size = 4, fontface = "bold")
 ```
 
 Individual-level characteristics explained only 4.3% of total premium variance, which makes sense given that insurance pricing is heavily influenced by policy structure and market factors. To answer our research question, we looked at how this 4.3% breaks down between modifiable and baseline factors. Figure X shows that among the variance we could explain with individual characteristics, modifiable lifestyle factors accounted for 61.8% while baseline demographic factors accounted for 39.0%. The two sets of predictors showed almost no overlap (about 1%), meaning modifiable and baseline factors work mostly independently in determining premiums. This shows that when it comes to the individual characteristics that do matter for premiums, lifestyle choices are much more important than things like age or sex that people cannot change. These findings are relevant for insurers designing pricing models and for individuals who want to lower their healthcare costs by changing their lifestyle habits.
