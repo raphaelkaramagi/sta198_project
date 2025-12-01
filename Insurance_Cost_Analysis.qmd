@@ -69,7 +69,7 @@ ggplot(data.frame(sample = residuals(mM)), aes(sample = sample)) +
   labs(title = "Q-Q Plot for baseline factors",
        x = "Theoretical Quantiles", y = "Sample Quantiles")
 ggplot(data = mM, mapping = aes(x = mM$residuals)) +
-  geom_histogram(color = "black") 
+  geom_histogram(color = "black") +
   labs(title = "Histogram of Residuals",
        x = "Residual", y = "Count") 
 ggplot(data.frame(sample = residuals(mM)), aes(sample = sample)) +
@@ -85,7 +85,7 @@ ggplot(data.frame(fitted = fitted(mB), residuals = residuals(mB)),
   labs(title = "Residuals vs Fitted for baseline factors",
        x = "Fitted Values", y = "Residuals")
 ggplot(data = mB, mapping = aes(x = mB$residuals)) +
-  geom_histogram(color = "black") 
+  geom_histogram(color = "black") +
   labs(title = "Histogram of Residuals",
        x = "Residual", y = "Count")
 ggplot(data.frame(sample = residuals(mB)), aes(sample = sample)) +
@@ -347,15 +347,19 @@ anova_m3_m4 <- anova(m3, m4)
 print(anova_m3_m4)
 
 # Model selection criteria
-cat("\n MODEL SELECTION CRITERIA \n")
+
+# GLMs don't have standard r.squared. Calculating Pseudo R-squared: 1 - (deviance / null.deviance)
+r2_m1 <- 1 - (m1$deviance / m1$null.deviance)
+r2_m2 <- 1 - (m2$deviance / m2$null.deviance)
+r2_m3 <- 1 - (m3$deviance / m3$null.deviance)
+r2_m4 <- 1 - (m4$deviance / m4$null.deviance)
+
 model_comparison <- data.frame(
   Model = c("Modifiable Only", "Baseline Only", "Full Model", "Full + Interaction"),
   AIC = c(AIC(m1), AIC(m2), AIC(m3), AIC(m4)),
   BIC = c(BIC(m1), BIC(m2), BIC(m3), BIC(m4)),
-  R_squared = c(summary(m1)$r.squared, summary(m2)$r.squared, 
-                summary(m3)$r.squared, summary(m4)$r.squared),
-  Adj_R_squared = c(summary(m1)$adj.r.squared, summary(m2)$adj.r.squared,
-                    summary(m3)$adj.r.squared, summary(m4)$adj.r.squared)
+  # Use the calculated Pseudo R-squared values here
+  Pseudo_R_squared = c(r2_m1, r2_m2, r2_m3, r2_m4)
 )
 print(model_comparison)
 
