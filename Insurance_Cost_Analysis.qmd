@@ -34,8 +34,7 @@ insurance <- insurance_raw %>%
   select(all_of(relevant_cols)) %>%
   filter(annual_premium > 0)
 
-# 3. Factor Levels (Run BEFORE na.omit)
-# Note: specific spelling "Occasional" to match dataset
+# 3. Factor Levels 
 insurance <- insurance %>%
   mutate(
     smoker = factor(smoker, levels = c("Never", "Former", "Current")),
@@ -47,8 +46,6 @@ insurance <- insurance %>%
     urban_rural = factor(urban_rural)
   )
 
-# 4. CRITICAL FIX: Run na.omit LAST
-# This removes rows that became NA during the Factor step (Step 3)
 insurance <- na.omit(insurance)
 ```
 
