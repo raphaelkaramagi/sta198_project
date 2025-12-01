@@ -85,6 +85,11 @@ insurance %>%
 ```
 ## 2.2 Distribution and Transformation
 Linear regression relies on the assumption of normality in the error terms. As shown in Figure 1 (Left), the raw annual premium distribution is heavily right-skewed. To satisfy the normality assumption, we applied a log-transformation (ln(*Premium*)). Figure 1 (Right) confirms that the transformed variable approximates a normal distribution, validating the use of log-linear regression [2].
+
+After fitting the models, we generate residual plots for each. Observing the plots, we can see that for each of the three models, there seems to be a roughly constant variance no matter the value of the predictor. (ish?) However, linearity of the parameters is clearly not fufilled as the points are not distributed symetrically around the x axis.
+
+##do we need to address this?
+
 ```{r}
 #| label: fig-normality
 #| #| fig-pos: 'H'
@@ -100,7 +105,38 @@ p2 <- ggplot(insurance, aes(x = log(annual_premium))) +
   theme_minimal()
 
 grid.arrange(p1, p2, ncol = 2)
+
+# Fit Models
+m1_base <- lm(log(annual_premium) ~ age + sex + education + income + marital_status + household_size + region + urban_rural, data = insurance)
+
+m2_life <- lm(log(annual_premium) ~ smoker + alcohol_freq, data = insurance)
+
+m3_full <- lm(log(annual_premium) ~ age + sex + education + income + marital_status + household_size + region + urban_rural + bmi + smoker + alcohol_freq + age*smoker, data = insurance)
+
+# Check for linearity and homoscedasticity of errors
+
+pr1 <- ggplot(data = m1_base, mapping = aes(x = m1_base$fitted.values, y = m1_base$residuals)) + 
+  geom_point() + 
+  labs(x = "Fitted values", y = "Residuals",
+       title = "...") + 
+  geom_hline(yintercept = 0, color = "red") # add a horizontal red line at 0
+
+pr2 <- ggplot(data = m2_life, mapping = aes(x = m2_life$fitted.values, y = m2_life$residuals)) + 
+  geom_point() + 
+  labs(x = "Fitted values", y = "Residuals",
+       title = "...") + 
+  geom_hline(yintercept = 0, color = "red") # add a horizontal red line at 0
+
+pr3 <- ggplot(data = m3_full, mapping = aes(x = m3_full$fitted.values, y = m1$residuals)) + 
+  geom_point() + 
+  labs(x = "Fitted values", y = "Residuals",
+       title = "...") + 
+  geom_hline(yintercept = 0, color = "red") # add a horizontal red line at 0
+
+grid.arrange(pr1, pr2, pr3, ncol = 3)
+
 ```
+
 ## 2.3 Visualizing the "Smoking Penalty" and Interaction
 We hypothesized that the cost burden of smoking might vary by age. Figure 2 plots Age against Log-Premium, stratified by smoking status.
 
@@ -140,31 +176,34 @@ ggplot(insurance, aes(x = bmi, y = log(annual_premium))) +
 
 # 3. Methodology
 
-To isolate the variance explained by lifestyle choices, we employ Hierarchical Multiple Linear Regression[3]. We fit two distinct models:
+To isolate the variance explained by lifestyle choices, we employ Hierarchical Multiple Linear Regression[3]. We fit three distinct models:
 
 Model 1: Baseline Demographics This model accounts for fixed factors the individual cannot easily change. 
-$$ \ln(Y) = \beta_0 + \beta_{Age} + \beta_{Sex} + \beta_{Region} + \beta_{Income} + \dots + \epsilon $$
+$$ \ln(Y) = \beta_0 + \beta_{Age} + \beta_{Sex} + \beta_{Region} + \beta_{Income} + \beta_{MaritalStatus} + \beta_{Urban/Rural} + \beta_{Education} + \epsilon $$
 
 Model 2: Lifestyle This model accounts for only modifiable behaviors that the individual can easily change
-$$ \ln(Y) =   \beta_{Smoker} + \beta_{Alcohol} + \epsilon $$
+$$ \ln(Y) =  \beta_0 + \beta_{Smoker} + \beta_{Alcohol} + \epsilon $$
 
 Model 3: Full Model (Demographics + Lifestyle) This model adds modifiable behaviors. Based on the interaction observed in Section 2.3, we include an interaction term for Age and Smoking. 
 $$ \ln(Y) =  \beta_{BMI} + \beta_{Smoker} + \beta_{Alcohol} + (\beta_{Age} \times \beta_{Smoker}) + \epsilon $$
 
-We utilize Analysis of Variance (ANOVA) to statistically compare the two models. The F-test in the ANOVA will determine if the reduction in the Residual Sum of Squares (RSS) provided by the lifestyle variables is statistically significant.
+We utilize Analysis of Variance (ANOVA) to statistically compare models 1 and 2 with the Full Model. The F-test in the ANOVA will determine if the reduction in the Residual Sum of Squares (RSS) provided by the lifestyle/demographic variables is statistically significant.
 
 # 4. Results
 
 ## 4.1 ANOVA Model Comparison
 
 We performed an ANOVA F-test to compare the explanatory power of Model 1 (Demographics) versus Model 2 (Full).
+
 ```{r}
-# Fit Models
-m1_base <- lm(log(annual_premium) ~ age + sex + education + income + marital_status + household_size + region + urban_rural, data = insurance)
+grid.arrange(p1, p2, ncol = 2)
 
-m2_life <- lm(log(annual_premium) ~ smoker + alcohol_freq, data = insurance)
+ggplot(data.frame(sample = residuals(mB)), aes(sample = sample)) +
+  stat_qq(color = "black") +
+  stat_qq_line(color = "red", linetype = "dashed") +
+  labs(title = "Q-Q Plot for baseline factors",
+       x = "Theoretical Quantiles", y = "Sample Quantiles")
 
-m3_full <- lm(log(annual_premium) ~ age + sex + education + income + marital_status + household_size + region + urban_rural + bmi + smoker + alcohol_freq + age*smoker, data = insurance)
 
 # Output ANOVA Table 1
 anova(m1_base, m3_full) %>%
@@ -176,6 +215,7 @@ anova(m2_lifestyle, m3_full) %>%
   kable(caption = "ANOVA Comparison: Lifestyle vs. Full Model", digits = 2) %>%
   kable_styling(latex_options = "hold_position")
 ```
+
 Interpretation: The ANOVA table shows a highly significant result for Model 3
 
 Comparing Baseline Demographics to Full Model
@@ -208,7 +248,6 @@ kable(dfr2, caption = "R\u00B2 Values of Demographic, Lifestyle, and Full Model"
 
 R231 <- R23 - R21
 R232 <- R23 - R22
-
 
 dfr2c <- data.frame(
   Category = c("ΔR\u00B2 (demographic, full)", "ΔR\u00B2 (lifestyle, full)"),
@@ -258,7 +297,6 @@ To ensure the validity of our inference, we examined the residual plots for Mode
 - Linearity and Homoscedasticity: Figure 4 (Left) displays the Residuals vs. Fitted values. The points are randomly distributed around the horizontal zero line without a distinct funnel shape. This indicates that the assumption of homoscedasticity (constant variance of errors) is largely met.
 
 - Normality of Residuals: Figure 4 (Right) shows the Normal Q-Q plot. The points (circles) adhere closely to the diagonal line for the majority of observations. However, the tails deviate upward. This "heavy-tailed" behavior indicates that our model slightly underestimates the premiums for the most extreme, high-cost outliers. Given the large sample size ($N \approx 100,000$), the Central Limit Theorem ensures that our coefficient estimates remain unbiased despite this minor deviation.
-
 
 
 ```{r}
