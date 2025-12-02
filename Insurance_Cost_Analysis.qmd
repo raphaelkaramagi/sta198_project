@@ -134,7 +134,7 @@ pr2 <- ggplot(data = m2_life, mapping = aes(x = m2_life$fitted.values, y = m2_li
        title = "...") + 
   geom_hline(yintercept = 0, color = "red") # add a horizontal red line at 0
 
-pr3 <- ggplot(data = m3_full, mapping = aes(x = m3_full$fitted.values, y = m1$residuals)) + 
+pr3 <- ggplot(data = m3_full, mapping = aes(x = m3_full$fitted.values, y = m3_full$residuals)) + 
   geom_point() + 
   labs(x = "Fitted values", y = "Residuals",
        title = "...") + 
@@ -205,12 +205,11 @@ We performed an ANOVA F-test to compare the explanatory power of Model 1 (Demogr
 ```{r}
 grid.arrange(p1, p2, ncol = 2)
 
-ggplot(data.frame(sample = residuals(mB)), aes(sample = sample)) +
+ggplot(data.frame(sample = residuals(m3_full)), aes(sample = sample)) +
   stat_qq(color = "black") +
   stat_qq_line(color = "red", linetype = "dashed") +
   labs(title = "Q-Q Plot for baseline factors",
        x = "Theoretical Quantiles", y = "Sample Quantiles")
-
 
 # Output ANOVA Table 1
 anova(m1_base, m3_full) |>
