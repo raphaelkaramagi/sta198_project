@@ -84,8 +84,9 @@ insurance |>
   kable(caption = "Summary of Numerical Variables", digits = 2) |>
   kable_styling(latex_options = "hold_position")
 ```
+
 ## 2.2 Distribution and Transformation
-Linear regression assumes approximately normal residuals with constant variance. When the response variable is heavily right-skewed, these assumptions are typically violated. As shown in Figure 1 (Left), the raw annual premium distribution exhibits substantial right-skewness. We therefore applied a log-transformation, ln(Premium), which produces a more symmetric distribution (Figure 1, Right). This transformation typically improves residual normality and homoscedasticity, which we verify in Section 4.1.
+Linear regression assumes approximately normal residuals with constant variance. When the response variable is heavily right-skewed, these assumptions are typically violated. As shown in Figure 1 (Left), the raw annual premium distribution exhibits substantial right-skewness. We therefore applied a log-transformation, ln(Premium), which produces a more symmetric distribution (Figure 1, Right). This transformation typically improves residual normality and homoscedasticity (equal variances), which we verify in Section 4.1.
 
 ```{r}
 # Fit Models
@@ -99,6 +100,7 @@ m3_full <- lm(log(annual_premium) ~ age + sex + education + income + marital_sta
 ```{r}
 #| label: fig-distribution
 #| fig-cap: "Distribution of annual premiums before and after log-transformation"
+#| #| fig-pos: 'H'
 
 p1 <- ggplot(insurance, aes(x = annual_premium)) +
   geom_histogram(bins = 50, fill = "orange", color = "white") +
@@ -140,32 +142,38 @@ ggplot(insurance, aes(x = age, y = log(annual_premium), color = smoker)) +
 
 # 3. Methodology
 
-To isolate the variance explained by lifestyle choices, we employ Hierarchical Multiple Linear Regression[3]. We fit three distinct models:
+To isolate the variance explained by lifestyle choices versus demographics, we employ Hierarchical Multiple Linear Regression [3]. This approach allows us to enter variables in blocks to determine the incremental variance explained by each category.
 
-Model 1: Baseline Demographics This model accounts for fixed factors the individual cannot easily change. 
-$$ \ln(Y) = \beta_0 + \beta_{Age} + \beta_{Sex} + \beta_{Region} + \beta_{Income} + \beta_{MaritalStatus} + \beta_{Urban/Rural} + \beta_{Education} + \epsilon $$
+We fit three distinct models:
 
-Model 2: Lifestyle This model accounts for only modifiable behaviors that the individual can easily change
-$$ \ln(Y) =  \beta_0 + \beta_{Smoker} + \beta_{Alcohol} + \beta_{BMI} +  \epsilon $$
+Model 1: Baseline Demographics Accounts only for fixed factors the individual cannot easily change. $$ \ln(Y) = \beta_0 + \beta_{Age} + \beta_{Sex} + \beta_{Region} + \beta_{Income} + \dots + \epsilon $$
 
-Model 3: Full Model (Demographics + Lifestyle) This model adds modifiable behaviors. Based on the interaction observed in Section 2.3, we include an interaction term for Age and Smoking. 
-$$ \ln(Y) = \beta_0 + \beta_{Age} + \beta_{Sex} + \beta_{Region} + \beta_{Income} + \beta_{MaritalStatus} + \beta_{Urban/Rural} + \beta_{Education} $$
-$$ + \beta_{BMI} + \beta_{Smoker} + \beta_{Alcohol} + (\beta_{Age} \times \beta_{Smoker}) + \epsilon $$
+Model 2: Lifestyle Only Accounts only for modifiable behaviors. $$ \ln(Y) = \beta_0 + \beta_{Smoker} + \beta_{Alcohol} + \beta_{BMI} + \epsilon $$
 
-We utilize Analysis of Variance (ANOVA) to statistically compare models 1 and 2 with the Full Model. The F-test in the ANOVA will determine if the reduction in the Residual Sum of Squares (RSS) provided by the lifestyle/demographic variables is statistically significant.
+Model 3: Full Model (Demographics + Lifestyle) Combines both categories and includes the interaction term observed in EDA. $$ \ln(Y) = \text{Model 1} + \text{Model 2} + (\beta_{Age} \times \beta_{Smoker}) + \epsilon $$
+
+Justification and Diagnostics
+
+We chose Ordinary Least Squares (OLS) regression on the log-transformed outcome. OLS provides highly interpretable coefficients, allowing us to quantify the precise percentage change in premiums associated with each lifestyle factor. The log-transformation addresses the right-skewness identified in EDA.
+
+To ensure our results are valid, we will assess three key assumptions in the Results section:
+
+Linearity & Homoscedasticity: Using Residuals vs. Fitted plots to ensure errors have constant variance.
+
+Normality: Using Q-Q plots to ensure residuals follow a normal distribution.
+
+Independence: 
 
 # 4. Results
 
 ## 4.1 Diagnostics and Assumptions Checking
 To ensure the validity of our inference, we examined the residual plots for the full Model.
 
-- Linearity: Figure 4 (Left)
-
-- Equal Variance: Figure 4 (Left)
+- Linearity & Equal Variance: The Residuals vs Fitted plot (Figure 3, Left) shows a random cloud of points around zero, indicating these assumptions are met.
 
 - Independence: 
 
-- Normality of Residuals: Figure 4 (Right) shows the Normal Q-Q plot. The points (circles) adhere closely to the diagonal line for the majority of observations. However, the tails deviate upward. This "heavy-tailed" behavior indicates that our model slightly underestimates the premiums for the most extreme, high-cost outliers. Given the large sample size ($N \approx 100,000$), the Central Limit Theorem ensures that our coefficient estimates remain unbiased despite this deviation.
+- Normality of Residuals: Figure 4 (Right) shows the Normal Q-Q plot. The points (circles) adhere closely to the diagonal line for the majority of observations. However, the tails deviate upward. This "heavy-tailed" behavior indicates that our model slightly underestimates the premiums for the most extreme, high-cost outliers. Given the large sample size ($N \approx 100,000$), the Central Limit Theorem ensures that our coefficient estimates remain unbiased despite this deviation [2].
 
 
 ```{r}
