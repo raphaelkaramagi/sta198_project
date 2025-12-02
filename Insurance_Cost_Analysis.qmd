@@ -171,7 +171,7 @@ To ensure the validity of our inference, we examined the residual plots for the 
 
 - Linearity & Equal Variance: The Residuals vs Fitted plot (Figure 3, Left) shows a random cloud of points around zero, indicating these assumptions are met.
 
-- Independence: 
+- Independence: One key source of this dataset is the National Health Interview survey; this survey is conducted on a voluntary basis. Consequently, there is a self-selection bias that may affect the ability to fully assume independence for this study.
 
 - Normality of Residuals: Figure 4 (Right) shows the Normal Q-Q plot. The points (circles) adhere closely to the diagonal line for the majority of observations. However, the tails deviate upward. This "heavy-tailed" behavior indicates that our model slightly underestimates the premiums for the most extreme, high-cost outliers. Given the large sample size ($N \approx 100,000$), the Central Limit Theorem ensures that our coefficient estimates remain unbiased despite this deviation [2].
 
@@ -288,15 +288,15 @@ Key Findings:
 # 5. Discussion
 
 **5.1 Locus of Control: Lifestyle Matters More** 
-Our analysis reveals a crucial insight for consumers: Modifiable Lifestyle Choices (MLC) are stronger predictors of insurance premiums than Baseline Demographic Factors (DRF). In isolation, lifestyle choices explained ~3.4% of the variance, whereas demographics explained ~2.5%. This is empowering, as it suggests that the factors driving costs up (Smoking, BMI) are within the individual's control.
+Our analysis reveals a crucial insight for consumers: Modifiable Lifestyle Choices (MLC) are stronger predictors of insurance premiums than Baseline Demographic Factors (DRF). Holding other variables constant, lifestyle choices explained ~3.4% of the variance. In contrast, demographics explained ~2.5% of the variance. This suggests that the factors driving costs up (Smoking, BMI) are within the individual's control.
 
 **5.2 The "Double Penalty" of Smoking** 
-The identification of a statistically significant interaction between Age and Smoking provides a compelling financial incentive for cessation. A 50-year-old smoker does not just pay the standard "smoker fee"; they pay a compounded rate. This suggests that the "return on investment" for quitting smoking increases as one gets older.
+The identification of a statistically significant interaction between Age and Smoking provides a strong argument against smoking amongst old individuals. An older smoker does not face the same monetary consequences as a younger smoker in terms of monthly premium; they pay a more significant fee.
 
 **5.3 Critique of Methodology and Data Validity** 
 Perhaps the most significant finding is what the model failed to explain. Our Full Model achieved an R² of only ~0.06. This implies 94% of the variance in insurance premiums is unexplained. This is likely due to Omitted Variable Bias [2]; premiums are heavily influenced by realized medical risk (e.g., Cancer history, Chronic conditions) which were absent from this dataset.
 
-Additionally, the Data Reliability must be critiqued. The dataset is synthetic (derived from CDC/CMS logic), meaning it may smooth over real-world complexities. The lack of significance for Alcohol Frequency may stem from reporting bias, as individuals often under-report substance use in surveys.
+Additionally, the Data Reliability must be critiqued. For instance, the lack of significance for Alcohol Frequency may stem from reporting bias, as individuals often under-report substance use in surveys.
 
 **5.4 Alternative Techniques & Future Work** 
 While Linear Regression provided clear interpretability, the heavy tails in our residuals suggest that Quantile Regression or Generalized Linear Models (GLM) with a Gamma distribution might handle the high-cost outliers more effectively. Future research should prioritize obtaining real-world claims data containing specific medical history variables to improve predictive power.
