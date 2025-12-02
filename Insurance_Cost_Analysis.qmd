@@ -71,7 +71,7 @@ Baseline Demographics (DRF): Age, Sex, Education level, Income, Marital Status, 
 
 # 1.2 Exploratory Data Analysis
 
-Table 1 provides summary statistics of the response variable (Premium), namely, median, mean, minimum and maximum. As the mean premium, at 582.32 USD, is substantially higher than the median, at 463.58 USD, we can infer a right-skewed distribution. Further, the extremely high value of the maximum premium, at 10962.55 USD, especially in comparison to the minimum premium value of 211.67 USD, may imply the presence of high outliers. 
+Table 1 provides summary statistics of the response variable (Annual Premium), namely, median, mean, minimum and maximum. As the mean premium, at 582.32 USD, is substantially higher than the median, at 463.58 USD, we can infer a right-skewed distribution. Further, the extremely high value of the maximum premium, at 10962.55 USD, especially in comparison to the minimum premium value of 211.67 USD, may imply the presence of high outliers. 
 
 ```{r}
 insurance |>
@@ -103,7 +103,7 @@ m2_life <- lm(log(annual_premium) ~ smoker + alcohol_freq + bmi, data = insuranc
 m3_full <- lm(log(annual_premium) ~ age + sex + education + income + marital_status + household_size + region + urban_rural + bmi + smoker + alcohol_freq + age*smoker, data = insurance)
 ```
 
-To determine whether the inclusion of lifestyle choices and demographics as predictor variables have an effect on the fit of a linear model, Hierarchical Multiple Linear Regression is employed [3]. This approach entails the comparison of a set of nested models: one full model will include the block of variables of interest while the other (reduced model) will include everything but said variables.  Analysis of Variance (ANOVA) using Partial F-tests is used to determine if the addition of a block of variables significantly reduces the Sum of Squared Errors (SSE) compared to a reduced model.
+To isolate the variance explained by lifestyle choices versus demographics, we employ Hierarchical Multiple Linear Regression [3]. This approach allows us to enter variables in blocks to determine the unique variance explained by each category. We utilize Analysis of Variance (ANOVA) using Partial F-tests to determine if the addition of a block of variables significantly reduces the Sum of Squared Errors (SSE) compared to a reduced model.
 
 We fit three distinct models:
 
@@ -113,13 +113,15 @@ Model 2: Lifestyle Only Accounts only for modifiable behaviors. $$ \ln(Y) = \bet
 
 Model 3: Full Model (Demographics + Lifestyle) Combines both categories and includes the interaction term observed in EDA. $$ \ln(Y) = \text{Model 1} + \text{Model 2} + \epsilon $$
 
-Following comparison using ANOVA, the change in R^2 between  DRF vs. full model and the MLC vs. full model was utilized to assess the which set of variables had a more substantial effect in reducing the squared residuals. 
+While ANOVA tests for statistical significance, it does not quantify effect size. Therefore, we also compare the change in Adjusted R² between the partial models (DRF vs. Full and MLC vs. Full). This allows us to assess which set of variables has a more substantial practical effect on reducing the squared residuals.
 
 # 2.1 Log Transformation
-The use of a log transformation is to address the requirement of normality in the residuals necessitated by Least Squares Regression [2]. When a full model is fit without it, its associated residual histogram is right skewed (Figure 1). To address this, a log-transformation [2] was applied to the outcome variable: annual premium. Doing so produces a more symmetric residual distribution (Figure 2, Bottom), and allows for the normality requirement to be satisfied. Other models (DRF and MLC) also showed roughly normal distributions when log was applied to the outcome variable.
+The use of a log transformation is to address the requirement of normality in the residuals required by Least Squares Regression [2]. When a full model is fit without it, its associated residual histogram is right skewed (Figure 1). To address this, we applied a  log-transformation [2] to the outcome variable: annual premium. Doing so produced more symmetric residual distribution (Figure 2), and allowed for the normality requirement to be satisfied. Other models (DRF and MLC) also showed roughly normal distributions when log was applied to the outcome variable (Figure 2). 
 
 ```{r}
 #| fig-pos: 'H'
+#| label: fig-rawresiduals
+
 
 p3 <- ggplot(data = p3_full, mapping = aes(x = p3_full$residuals)) + 
   geom_histogram(bins = 50, fill = "orange", color = "white") +
@@ -132,6 +134,8 @@ grid.arrange(p3, ncol = 1)
 
 ```{r}
 #| fig-pos: 'H'
+#| label: fig-residuals
+
 
 m1 <- ggplot(data = m1_base, mapping = aes(x = m1_base$residuals)) + 
   geom_histogram(bins = 50, fill = "orange", color = "white") +
@@ -171,7 +175,7 @@ To ensure the validity of our inference, we examined the residual plots for the 
 
 - Linearity & Equal Variance: The Residuals vs Fitted plot (Left) shows a random cloud of points around zero with no distinct pattern (e.g., no funnel shape). This indicates that the assumptions of linearity and constant variance are reasonably satisfied.
 
-- Independence: One key source of this dataset is the National Health Interview survey; this survey is conducted on a voluntary basis. Consequently, there is a self-selection bias that may affect the ability to fully assume independence for this study.
+- Independence: One key source of this dataset [1] is the National Health Interview survey; this survey is conducted on a voluntary basis. Consequently, there is a self-selection bias that may affect the ability to fully assume independence for this study.
 
 - Normality of Residuals: As shown earlier in the residual histograms, the normality of the residuals for each of the three models is roughly fulfilled. Further, figure 4 (Right) shows the Normal Q-Q plot for the full model. The points (circles) adhere closely to the diagonal line for the majority of observations. However, the tails deviate upward. This "heavy-tailed" behavior indicates that our model slightly underestimates the premiums for the most extreme, high-cost outliers. Given the large sample size ($N \approx 100,000$), the Central Limit Theorem ensures that our coefficient estimates remain unbiased despite this deviation [2].
 
@@ -208,11 +212,13 @@ anova(m2_life, m3_full) |>
 
 **Testing the Addition of Demographic Factors**
 
-**H(null)**: \beta_{Age} = \beta_{Sex} =  \beta_{Region} = \beta_{Income} = \beta_{MaritalStatus} = \beta_{Urban/Rural} = \beta_{Education} = 0
+**H(null):** $\beta_{Age} = \beta_{Sex} =  \beta_{Region} = \beta_{Income} = \beta_{MaritalStatus} = \beta_{Urban/Rural} = \beta_{Education}  0$
 
-**H(alt)**: At least one of  \beta_{Age}, \beta_{Sex}, \beta_{Region}, \beta_{Income}, \beta_{MaritalStatus}, \beta_{Urban/Rural},  \beta_{Education} != 0
+**H(alt):** At least one of  $\beta_{Age}, \beta_{Sex}, \beta_{Region}, \beta_{Income}, \beta_{MaritalStatus}, \beta_{Urban/Rural},  \beta_{Education} ≠ 0$
 
-We compared the Lifestyle-only model against the Full model to see if adding Demographics significantly reduced the squared residuals. The F-test yielded an F-statistic of 461.19 and a p-value displaying 0, clearly less than <0.05. We reject the null hypothesis that all demographic coefficients are zero. Therefore, variation at least one of the socioeconomic/demographic factors seems to help explain the variation in the log(annual premium); the addition of DRF helps reduce the squared residuals and provide statistically significant explanatory power.
+
+We compared the Lifestyle-only model against the Full model to see if adding Demographics significantly reduced the squared residuals. The F-test yielded an F-statistic of 461.19 and a p-value <0.001. We reject the null hypothesis. This confirms that demographic factors (Age, Income, etc.) do provide statistically significant explanatory power.
+
 
 **Testing the Addition of Modifiable Lifestyle Factors** 
 
@@ -220,9 +226,9 @@ We compared the Lifestyle-only model against the Full model to see if adding Dem
 
 **H(alt)**: At least one of $\beta_{Smoker},  \beta_{Alcohol},  \beta_{BMI}  ≠ 0$
 
-We compared the Demographic-only model against the Full model to see if adding Lifestyle factors improved the fit. The F-test yielded an F-statistic of 128.88 and a p-value displaying 0, clearly less than <0.05. We reject the null hypothesis that lifestyle coefficients are zero. Therefore, variation at least one of the modifiable life choices seems to help explain the variation in the log(annual premium); This confirms that modifiable choices (Smoking, BMI) also significantly explain variation in premiums.
+We compared the Demographic-only model against the Full model to see if adding Lifestyle factors improved the fit. The F-test yielded an F-statistic of 128.88 and a p-value <0.001. We reject the null hypothesis. This confirms that modifiable choices (Smoking, BMI) also significantly explain variation in premiums.
 
-The ANOVA tests conclude that the addition of MLC parameters to a DRF model may help explain the variation in the log(annual premium). However, as the degrees of freedom are not the same for each ANOVA test, the F value cannot be used directly to compare the impact of the added Demographic/Modifiable variables.
+The ANOVA tests conclude that the addition of MLC parameters to a DRF model helps explain the variation in the log(annual premium). However, as the degrees of freedom are not the same for each ANOVA test, the F value cannot be used directly to compare the practical impact of the added variables.
 
 ## 3.3 Comparison of R² Values
 
