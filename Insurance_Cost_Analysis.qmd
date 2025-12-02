@@ -55,9 +55,9 @@ However, health insurance costs vary from one individual to another; factors suc
 
 However, individuals with other pre-existing health risks may themselves select costlier healthcare plans that provide greater coverage. Further, other variables may affect tobacco use. Overall, we can categorize factors that potentially drive healthcare cost into two categories: modifiable lifestyle choices and baseline demographic/socioeconomic factors. 
 
-Many studies have investigated the role of these variables individually. We try to fill a research gap by investigating how much premium prices can be attributed by baseline demographic/socioeconomic factors (DRF) versus modifiable lifestyle factors (MLC); does one category have a more substantial effect on insurance cost variance? The results indicate how institutions and individuals can make healthcare more affordable. For instance, if insurance cost variance is heavily driven by MLC, customers can lower prices by modifying behaviors. However, if insurance cost is heavily driven by DRF, policy changes may be required to lower costs.
+Many studies have investigated the role of these variables individually. This study attempts to fill a research gap by investigating how much premium prices can be attributed by baseline demographic/socioeconomic factors (DRF) versus modifiable lifestyle factors (MLC); does one category have a more substantial effect on insurance cost variance? The results indicate how institutions and individuals can make healthcare more affordable. For instance, if insurance cost variance is heavily driven by MLC, customers can lower prices by modifying behaviors. However, if insurance cost is heavily driven by DRF, policy changes may be required to lower costs.
 
-We consider three variables representing MLC: smoking status (current, former, never), alcohol consumption frequency (never, occasionally, weekly, daily), and BMI. We consider six variables representing DRF, age, sex, highest education level, income, marital status, and household size.
+Tthree variables representing MLC are considered: smoking status (current, former, never), alcohol consumption frequency (never, occasionally, weekly, daily), and BMI. We consider six variables representing DRF, age, sex, highest education level, income, marital status, and household size.
 
 Dataset: We utilize the Medical Insurance Cost Prediction dataset from Kaggle [1]. The dataset contains approximately 100,000 observations including demographic details (Age, Sex, Income) and lifestyle indicators (Smoking status, BMI, Alcohol frequency). Constituent data was derived from three main sources: Centers for Disease Control and Prevention (CDC), U.S. Department of Health & Human Services (HHS), and Centers for Medicare & Medicaid Services (CMS). 
 
@@ -191,7 +191,8 @@ plot(m3_full, which = 2, main = "Normal Q-Q")
 
 ## 4.2 ANOVA Model Comparison
 
-We performed an ANOVA F-test to compare the explanatory power of Model 1 (Demographics) versus Model 3 (full) and  Model 2 (Lifestyle) versus Model 3 (Full).
+To test whether the addition of DRF parameters and MLC parameters has an effect on squared residuals of the model, an ANOVA F-test is utilized. The DRF-only model was compared to the full model to assess the effect of MLC parameters; the MLC-only model was compared to the full model to assess the effect  
+
 
 ```{r}
 # Output ANOVA Table 1
@@ -205,21 +206,19 @@ anova(m2_life, m3_full) |>
   kable_styling(latex_options = "hold_position")
 ```
 
-Interpretation: The ANOVA table shows a highly significant result for Model 3
 
-Comparing Demographics to Full Model
-H(null): The additional coefficients (slope) are all zero; therefore, additional variables (lifestlye choices) do not contribute to model fit
-H(alternative): The additional coefficients (slope) are not all zero; therefore, additional variables (lifestlye choices) do contribute to model fit
-- F-Statistic: The large F-value (461.19) implies that the variance explained by the added lifestyle variables is significantly greater than what we would expect by random chance
-- P-Value (< 0.001): Since $p < 0.05$, we reject the null hypothesis. We can conclude that adding Smoking, BMI, and Alcohol significantly improves the model fit over demographics alone. Note: The NA in the first row is normal, as it represents the baseline model against which the second model is compared.
+**Addition of Demographic/Socioeconomic Risk Factors**
+***H(null)**: \beta_{Age} = \beta_{Sex} =  \beta_{Region} = \beta_{Income} = \beta_{MaritalStatus} = \beta_{Urban/Rural} = \beta_{Education} = 0
+***H(alt)**: At least one of  \beta_{Age}, \beta_{Sex}, \beta_{Region}, \beta_{Income}, \beta_{MaritalStatus}, \beta_{Urban/Rural},  \beta_{Education} ≠ 0
+The The test statistic of 461.19 has a F distribution (df1 = 8, df2 = dummy) under the null hypothesis. The corresponding p value (apprxoimately 0) is clearly less than alpha value 0.05; this indicates that we can reject the null hypothesis and conclude that the demographic/socioeconomic parameters are not all equal to zero. Therefore, variation at least one of the socioeconomic/demographic factors seems to help explain the variation in the log(monthly premium); the addition of DRF helps reduce the squared residuals.
 
-Comparing Lifestyle Choices to Full Model
-H(null): The additional coefficients (slope) are all zero; therefore, additional variables (demographics) do not contribute to model fit
-H(alternative): The additional coefficients (slope) are not all zero; therefore, additional variables (demographics) do contribute to model fit
-- F-Statistic: The large F-value (139.44) implies that the variance explained by the added demographic variables is significantly greater than what we would expect by random chance
-- P-Value (< 0.001): Since $p < 0.05$, we reject the null hypothesis. We can conclude that adding Smoking, BMI, and Alcohol significantly improves the model fit over demographics alone. Note: The NA in the first row is normal, as it represents the baseline model against which the second model is compared.
+**Addition of Modifiable lifestyle choices**
+***H(null)**: \beta_{Smoker} = \beta_{Alcohol} =  \beta_{bmi} = 0
+**H(alt)**: At least one of \beta_{Smoker},  \beta_{Alcohol},  \beta_{bmi} ;  ≠ 0
+The test statistic of 139.44 has a F distribution (df1 = 8, df2 = dummy)  under the null hypothesis. The corresponding p value (apprxoimately 0) is clearly less than alpha value 0.05; this indicates that we can reject the null hypothesis and conclude that the modifiable life choice parameters are not all equal to zero. Therefore, variation at least one of the modifiable life choices seems to help explain the variation in the log(monthly premium); the addition of MLC helps reduce the squared residuals.
 
-As df values are not the same, the f value cannot be used to directly compare the impact of the added demographic variables.
+**Overall Conclusion:**
+The ANOVA tests conclude that the addition of MLC parameters to a DRF model may help explain the variation in the log(monthly premium). The same result was found when DRF parameters were added to a MLC model. However, as the degrees of freedom are not the same for each ANOVA test, the F value cannot be used directly to compare the impact of the added DRF/MLC variables.
 
 ## 4.3 Comparison of R^2 Values
 
@@ -229,7 +228,7 @@ R22 <- summary(m2_life)$r.squared
 R23 <- summary(m3_full)$r.squared
 
 dfr2 <- data.frame(
-  Category = c("R\u00B2 Demographic", "R\u00B2 Lifestyle", "Full Model"),
+  Category = c("R\u00B2 Demographic", "R\u00B2 Lifestyle", " R\u00B2 Full Model"),
   R2_Value = c(R21, R22, R23)
 )
 
@@ -246,7 +245,11 @@ dfr2c <- data.frame(
 kable(dfr2c, caption = "ΔR\u00B2 of Demographic and Lifestyle Model Compared to Full Model")
 
 ```
-ΔR² 
+
+**Change in Squared Residuals**
+To compare the effect of adding lifestyle variables versus demographic variables, the R² values can instead be observed. R² values are extremely low for all three models, at 0.0249, 0.0342, and 0.0596 for the demographic, lifestyle and full model respectively (Table X). This indicates that all three models do not have a strong fit for the data. 
+
+The effect of adding lifestyle variables versus demographic variables can be assed by comparing the change in R² value of the lifestyle and demographic model with the full model. The demographic-only model has a R² that is 0.0347 less than the full model (addition of lifestyle variables), while the lifestyle model has an R² that is 0.0255 less than the full model (addition of demographic variables). This indicates that the addition of the lifestyle variables has a more substantial effect on reducing the squared residuals of the model. 
 
 ## 4.4 Regression Coefficients
 Table 3 presents the coefficients for the Full Model. Since the response is log-transformed, coefficients ($\beta$) can be interpreted as an approximate $100 \times \beta \%$ change in the premium for small values.
