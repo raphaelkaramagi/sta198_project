@@ -91,7 +91,7 @@ insurance |>
   kable_styling(latex_options = "hold_position")
 ```
 ## 2.2 Distribution and Transformation
-Linear regression relies on the assumption of normality in the error terms. To satisfy the normality assumption, we applied a log-transformation (ln(*Premium*)). Figure 1 (Right) confirms that the transformed variable approximates a normal distribution, validating the use of log-linear regression [2].
+Linear regression relies on the assumption of normality in the error terms. To satisfy the normality assumption, we applied a log-transformation (ln(*Premium*)). Figure 1 confirms that the transformed variable approximates a normal distribution for the residuals, validating the use of log-linear regression [2].
 
 ```{r}
 # Fit Models
