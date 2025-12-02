@@ -70,7 +70,7 @@ Research Question: **How much can premium prices be attributed by baseline demog
 
 ## 2.1 Summary Statistics
 
-Table 1 summarizes the central tendencies of the continuous variables. The substantial difference between the median (463.58 USD) and mean (582.32 USSD) premium indicates a right-skewed distribution, suggesting the presence of high-cost outliers.
+Table 1 summarizes the central tendencies of the continuous variables. The substantial difference between the median (463.58 USD) and mean (582.32 USD) premium indicates a right-skewed distribution, suggesting the presence of high-cost outliers.
 ```{r}
 #| label: tbl-summary
 insurance |>
@@ -85,7 +85,7 @@ insurance |>
   kable_styling(latex_options = "hold_position")
 ```
 ## 2.2 Distribution and Transformation
-Linear regression assumes approximately normal residuals with constant variance. When the response variable is heavily right-skewed, these assumptions are typically violated. As shown in Figure 1 (Left), the raw annual premium distribution exhibits substantial right-skewness. We therefore applied a log-transformation, ln(Premium), which produces a more symmetric distribution (Figure 1, Right). This transformation typically improves residual normality and homoscedasticity, which we verify in Section 4.2.
+Linear regression assumes approximately normal residuals with constant variance. When the response variable is heavily right-skewed, these assumptions are typically violated. As shown in Figure 1 (Left), the raw annual premium distribution exhibits substantial right-skewness. We therefore applied a log-transformation, ln(Premium), which produces a more symmetric distribution (Figure 1, Right). This transformation typically improves residual normality and homoscedasticity, which we verify in Section 4.1.
 
 ```{r}
 # Fit Models
@@ -122,8 +122,8 @@ The Green Line (Current Smokers) shows a higher intercept, indicating a higher b
 
 ```{r}
 #| label: fig-interaction
-#| #| fig-pos: 'H'
-#| #| fig-cap: "Log-premium by age, stratified by smoking status. The steeper slope for current smokers suggests an interaction effect."
+#| fig-pos: 'H'
+#| fig-cap: "Log-premium by age, stratified by smoking status. The steeper slope for current smokers suggests an interaction effect."
 
 
 ggplot(insurance, aes(x = age, y = log(annual_premium), color = smoker)) +
@@ -142,8 +142,8 @@ We also examined the relationship between BMI and cost. Figure 3 shows a positiv
 
 ```{r}
 #| label: fig-bmi
-#| #| fig-pos: 'H'
-#| #| fig-cap: "Relationship between BMI and log-transformed annual premium, showing a weak positive association."
+#| fig-pos: 'H'
+#| fig-cap: "Relationship between BMI and log-transformed annual premium, showing a weak positive association."
 
 ggplot(insurance, aes(x = bmi, y = log(annual_premium))) +
   geom_hex(bins = 50) +
@@ -166,23 +166,30 @@ Model 2: Lifestyle This model accounts for only modifiable behaviors that the in
 $$ \ln(Y) =  \beta_0 + \beta_{Smoker} + \beta_{Alcohol} + \beta_{BMI} +  \epsilon $$
 
 Model 3: Full Model (Demographics + Lifestyle) This model adds modifiable behaviors. Based on the interaction observed in Section 2.3, we include an interaction term for Age and Smoking. 
-$$ \ln(Y) =  \beta_{Age} + \beta_{Sex} + \beta_{Region} + \beta_{Income} + \beta_{MaritalStatus} + \beta_{Urban/Rural} + \beta_{Education} + \beta_{Smoker} + \beta_{Alcohol} + \beta_{BMI}  + (\beta_{Age} \times \beta_{Smoker}) +  \epsilon $$
+$$ \ln(Y) = \beta_0 + \beta_{Age} + \beta_{Sex} + \beta_{Region} + \beta_{Income} + \beta_{MaritalStatus} + \beta_{Urban/Rural} + \beta_{Education} $$
+$$ + \beta_{BMI} + \beta_{Smoker} + \beta_{Alcohol} + (\beta_{Age} \times \beta_{Smoker}) + \epsilon $$
 
 We utilize Analysis of Variance (ANOVA) to statistically compare models 1 and 2 with the Full Model. The F-test in the ANOVA will determine if the reduction in the Residual Sum of Squares (RSS) provided by the lifestyle/demographic variables is statistically significant.
 
 # 4. Results
 
 ## 4.1 Diagnostics and Assumptions Checking
-To ensure the validity of our inference, we examined the residual plots for Model 2.
+To ensure the validity of our inference, we examined the residual plots for the full Model.
 
-- Linearity and Homoscedasticity: Figure 4 (Left) displays the Residuals vs. Fitted values. The points are randomly distributed around the horizontal zero line without a distinct funnel shape. This indicates that the assumption of homoscedasticity (constant variance of errors) is largely met.
+- Linearity: Figure 4 (Left)
 
-- Normality of Residuals: Figure 4 (Right) shows the Normal Q-Q plot. The points (circles) adhere closely to the diagonal line for the majority of observations. However, the tails deviate upward. This "heavy-tailed" behavior indicates that our model slightly underestimates the premiums for the most extreme, high-cost outliers. Given the large sample size ($N \approx 100,000$), the Central Limit Theorem ensures that our coefficient estimates remain unbiased despite this minor deviation.
+- Equal Variance: Figure 4 (Left)
+
+- Independence: 
+
+- Normality of Residuals: Figure 4 (Right) shows the Normal Q-Q plot. The points (circles) adhere closely to the diagonal line for the majority of observations. However, the tails deviate upward. This "heavy-tailed" behavior indicates that our model slightly underestimates the premiums for the most extreme, high-cost outliers. Given the large sample size ($N \approx 100,000$), the Central Limit Theorem ensures that our coefficient estimates remain unbiased despite this deviation.
 
 
 ```{r}
 #| label: fig-diagnostics
 #| #| fig-pos: 'H'
+#| #| fig-cap: "Diagnostic plots for the Full Model. Left: Residuals vs. Fitted values. Right: Normal Q-Q plot."
+
 
 par(mfrow = c(1, 2))
 plot(m3_full, which = 1, main = "Residuals vs Fitted")
@@ -191,14 +198,14 @@ plot(m3_full, which = 2, main = "Normal Q-Q")
 
 ```
 
-## 4.1 ANOVA Model Comparison
+## 4.2 ANOVA Model Comparison
 
-We performed an ANOVA F-test to compare the explanatory power of Model 1 (Demographics) versus Model 2 (Lifestyle) versues Model 3 (Full).
+We performed an ANOVA F-test to compare the explanatory power of Model 1 (Demographics) versus Model 3 (full) and  Model 2 (Lifestyle) versus Model 3 (Full).
 
 ```{r}
 # Output ANOVA Table 1
 anova(m1_base, m3_full) |>
-  kable(caption = "ANOVA Comparison: Baseline vs. Full Model", digits = 2) |>
+  kable(caption = "ANOVA Comparison: Demographics vs. Full Model", digits = 2) |>
   kable_styling(latex_options = "hold_position")
 
 # Output ANOVA Table 2
@@ -209,7 +216,7 @@ anova(m2_life, m3_full) |>
 
 Interpretation: The ANOVA table shows a highly significant result for Model 3
 
-Comparing Baseline Demographics to Full Model
+Comparing Demographics to Full Model
 H(null): The additional coefficients (slope) are all zero; therefore, additional variables (lifestlye choices) do not contribute to model fit
 H(alternative): The additional coefficients (slope) are not all zero; therefore, additional variables (lifestlye choices) do contribute to model fit
 - F-Statistic: The large F-value (461.19) implies that the variance explained by the added lifestyle variables is significantly greater than what we would expect by random chance
@@ -223,7 +230,7 @@ H(alternative): The additional coefficients (slope) are not all zero; therefore,
 
 As df values are not the same, the f value cannot be used to directly compare the impact of the added demographic variables.
 
-## Comparison of R^2 Values
+## 4.3 Comparison of R^2 Values
 
 ```{r}
 R21 <- summary(m1_base)$r.squared
@@ -241,16 +248,16 @@ R231 <- R23 - R21
 R232 <- R23 - R22
 
 dfr2c <- data.frame(
-  Category = c("ΔR\u00B2 (demographic, full)", "ΔR\u00B2 (lifestyle, full)"),
+  Category = c("ΔR\u00B2 (Full Model - Demographic)", "ΔR\u00B2 (Full Model - Lifestyle)"),
   R2_Value = c(R231, R232)
 )
 
 kable(dfr2c, caption = "ΔR\u00B2 of Demographic and Lifestyle Model Compared to Full Model")
 
 ```
-More substantial change in RR\u00B2 between demographic and full model (compared to change between lifestyle and full model) suggests that the addition of lifestyle factors has a more significant impact on the fit of the model than the addition of demographic factors. In particular, this difference in ΔR\u00B2 implies that the addition of lifestyle variables leads to a more substantial increase sum of the squared residuals.
+ΔR² 
 
-## 4.3 Regression Coefficients
+## 4.4 Regression Coefficients
 Table 3 presents the coefficients for the Full Model. Since the response is log-transformed, coefficients ($\beta$) can be interpreted as an approximate $100 \times \beta \%$ change in the premium for small values.
 
 ```{r}
@@ -261,6 +268,7 @@ tidy(m3_full) |>
     term = str_replace_all(term, "smokerCurrent", "Smoker: Current"),
     term = str_replace_all(term, "smokerFormer", "Smoker: Former"),
     term = str_replace_all(term, "alcohol_freqWeekly", "Alcohol: Weekly"),
+    term = str_replace_all(term, "alcohol_freqOccasional", "Alcohol: Occasional"),
     term = str_replace_all(term, "alcohol_freqDaily", "Alcohol: Daily"),
     term = str_replace_all(term, "age:smokerCurrent", "Interaction: Age * Smoker"),
     term = str_replace_all(term, "bmi", "BMI"),
