@@ -30,13 +30,12 @@ relevant_cols <- c(
 )
 
 # 2. Select Columns & Filter Zeros
-insurance <- insurance_raw %>%
-  select(all_of(relevant_cols)) %>%
+insurance <- insurance_raw |>
+  select(all_of(relevant_cols)) |>
   filter(annual_premium > 0)
 
-# 3. Factor Levels (Run BEFORE na.omit)
-# Note: specific spelling "Occasional" to match dataset
-insurance <- insurance %>%
+# 3. Factor Levels 
+insurance <- insurance |>
   mutate(
     smoker = factor(smoker, levels = c("Never", "Former", "Current")),
     alcohol_freq = factor(alcohol_freq, levels = c("None", "Occasional", "Weekly", "Daily")),
@@ -47,8 +46,6 @@ insurance <- insurance %>%
     urban_rural = factor(urban_rural)
   )
 
-# 4. CRITICAL FIX: Run na.omit LAST
-# This removes rows that became NA during the Factor step (Step 3)
 insurance <- na.omit(insurance)
 ```
 
@@ -56,6 +53,16 @@ insurance <- na.omit(insurance)
 Health insurance premiums in the United States are determined by complex actuarial algorithms. For the consumer, the weighting of these factors is often hard to interpret. While some determinants of cost are **Fixed Demographic Factors** (Age, Region, Sex), others are **Modifiable Lifestyle Choices** (Smoking, BMI, Alcohol Consumption).
 
 Understanding the distinction between these categories is vital. If premiums are driven primarily by demographics, consumers have little impact over their costs. However, if lifestyle factors are significant drivers, individuals can mitigate their financial burden through behavioral changes.
+
+In the United States, health insurance costs rank amongst the highest in the world. Within the year 2023, healthcare spending increased by 7.5%, totaling up to 4.9 trillion USD (ama). This consequently drives up the price of health insurance premiums. Recently, the rate of change in health insurance premiums has exceeded that of wages and inflation, making it harder for individuals to afford health insurance. However, health insurance costs vary from one individual to another; factors such age, location, and tobacco use are legally allowed increase the cost of one's premium. Further, individuals with other pre-existing health risks may themselves select costlier healthcare plans that provide greater coverage.
+
+Consequently, various factors may contribute to the cost of one's premium. However, these factors may be split into two groups: modifiable lifestyle choices and baseline demographic/socioeconomic factors. This study seeks to figure out what proportion of insurance cost variance is attributable to modifiable lifestyle choices versus baseline demographic and socioeconomic risk factors. Being able to see these results can inform the public on the factors they should be paying attention to if they want to lower their premiums. For example, if insurance cost variance is heavily driven by modifiable lifestyle choices such as smoking or alcohol consumption, prices are determined heavily on the behaviors of the customer. However, if the insurance cost variance is more controlled by the socioeconomic factors, then there must be a change in the system in order to lower costs.
+
+It is known that an individual's premium is determined by their risk score; what goes into the calculation of a risk score and their weights contributing to the risk score can get more complex. According to the health care law, insurance companies can only use five factors to determine health insurance premiums: age, location, tobacco use, individual vs. family enrollment, and type of plan (healthcare). For example, it is known that the average elderly individual paid three times more for health insurance compared to the average working age adult (bls). However, there could be underlying factors that could go into one's risk score. For instance, getting company-sponsored health insurance can present incentives by participating in workplace wellness programs, which could mean other factors could sway premiums (KFF). A lot of previous findings present how individual factors can affect health insurance costs; the gap we are trying to bridge is to find how much premium prices can be attributed by baseline demographic/socioeconomic factors versus modifiable lifestyle factors. 
+
+For the specific variables considered, within modifiable lifestyle choices, there is smoking status (current, former, or never), frequency of alcohol consumption (Never, occasionally, weekly, daily), and BMI. As for the baseline demographic/socioeconomic factors category, it contains age, sex, highest education level, income, marital status, and household size. The dataset containing all of these variables was obtained from Kaggle; the Kaggle dataset got it's data from 3 main sources: Centers for Disease Control and Prevention (CDC), U.S. Department of Health & Human Services (HHS), and Centers for Medicare & Medicaid Services (CMS). In the scope of our research question, the dataset contained an excess amount of information; thus, those columns were filtered out and we only looked at the variables apart of the two main categories. Throughout the paper, we will run regressions and visualize the data in order to see how the two categories influence the variance of medical insurance costs. 
+
+Research Question: What proportion of insurance cost variance is attributable to modifiable lifestyle choices versus baseline demographic and socioeconomic risk factors?
 
 
 Research Question:
@@ -72,19 +79,20 @@ We utilize the Medical Insurance Cost Prediction dataset from Kaggle [1]. The da
 Table 1 summarizes the central tendencies of the continuous variables. The substantial difference between the median (463.58 USD) and mean (582.32 USSD) premium indicates a right-skewed distribution, suggesting the presence of high-cost outliers.
 ```{r}
 #| label: tbl-summary
-insurance %>%
+insurance |>
   summarise(
     `Average Age` = mean(age),
     `Average BMI` = mean(bmi),
     `Median Premium` = median(annual_premium),
     `Mean Premium` = mean(annual_premium),
     `Max Premium` = max(annual_premium)
-  ) %>%
-  kable(caption = "Summary of Numerical Variables", digits = 2) %>%
+  ) |>
+  kable(caption = "Summary of Numerical Variables", digits = 2) |>
   kable_styling(latex_options = "hold_position")
 ```
 ## 2.2 Distribution and Transformation
 Linear regression relies on the assumption of normality in the error terms. As shown in Figure 1 (Left), the raw annual premium distribution is heavily right-skewed. To satisfy the normality assumption, we applied a log-transformation (ln(*Premium*)). Figure 1 (Right) confirms that the transformed variable approximates a normal distribution, validating the use of log-linear regression [2].
+
 ```{r}
 #| label: fig-normality
 #| #| fig-pos: 'H'
@@ -95,12 +103,13 @@ p1 <- ggplot(insurance, aes(x = annual_premium)) +
   theme_minimal()
 
 p2 <- ggplot(insurance, aes(x = log(annual_premium))) +
-  geom_histogram(bins = 40, fill = "steelblue", color = "white") +
+  geom_histogram(bins = 40, fill = "lightblue", color = "white") +
   labs(title = "Log-Transformed (Normal)", x = "Log(Premium)", y = "Count") +
   theme_minimal()
 
 grid.arrange(p1, p2, ncol = 2)
 ```
+
 ## 2.3 Visualizing the "Smoking Penalty" and Interaction
 We hypothesized that the cost burden of smoking might vary by age. Figure 2 plots Age against Log-Premium, stratified by smoking status.
 
@@ -140,44 +149,95 @@ ggplot(insurance, aes(x = bmi, y = log(annual_premium))) +
 
 # 3. Methodology
 
-To isolate the variance explained by lifestyle choices, we employ Hierarchical Multiple Linear Regression[3]. We fit two distinct models:
+To isolate the variance explained by lifestyle choices, we employ Hierarchical Multiple Linear Regression[3]. We fit three distinct models:
 
 Model 1: Baseline Demographics This model accounts for fixed factors the individual cannot easily change. 
-$$ \ln(Y) = \beta_0 + \beta_{Age} + \beta_{Sex} + \beta_{Region} + \beta_{Income} + \dots + \epsilon $$
+$$ \ln(Y) = \beta_0 + \beta_{Age} + \beta_{Sex} + \beta_{Region} + \beta_{Income} + \beta_{MaritalStatus} + \beta_{Urban/Rural} + \beta_{Education} + \epsilon $$
 
-Model 2: Full Model (Demographics + Lifestyle) This model adds modifiable behaviors. Based on the interaction observed in Section 2.3, we include an interaction term for Age and Smoking. 
-$$ \ln(Y) = \text{Model 1} + \beta_{BMI} + \beta_{Smoker} + \beta_{Alcohol} + (\beta_{Age} \times \beta_{Smoker}) + \epsilon $$
+Model 2: Lifestyle This model accounts for only modifiable behaviors that the individual can easily change
+$$ \ln(Y) =  \beta_0 + \beta_{Smoker} + \beta_{Alcohol} + \epsilon $$
 
-We utilize Analysis of Variance (ANOVA) to statistically compare the two models. The F-test in the ANOVA will determine if the reduction in the Residual Sum of Squares (RSS) provided by the lifestyle variables is statistically significant.
+Model 3: Full Model (Demographics + Lifestyle) This model adds modifiable behaviors. Based on the interaction observed in Section 2.3, we include an interaction term for Age and Smoking. 
+$$ \ln(Y) =  \beta_{BMI} + \beta_{Smoker} + \beta_{Alcohol} + (\beta_{Age} \times \beta_{Smoker}) + \epsilon $$
+
+We utilize Analysis of Variance (ANOVA) to statistically compare models 1 and 2 with the Full Model. The F-test in the ANOVA will determine if the reduction in the Residual Sum of Squares (RSS) provided by the lifestyle/demographic variables is statistically significant.
 
 # 4. Results
 
 ## 4.1 ANOVA Model Comparison
 
-We performed an ANOVA F-test to compare the explanatory power of Model 1 (Demographics) versus Model 2 (Full).
+We performed an ANOVA F-test to compare the explanatory power of Model 1 (Demographics) versus Model 2 (Lifestyle) versues Model 3 (Full).
+
 ```{r}
 # Fit Models
 m1_base <- lm(log(annual_premium) ~ age + sex + education + income + marital_status + household_size + region + urban_rural, data = insurance)
 
-m2_full <- lm(log(annual_premium) ~ age + sex + education + income + marital_status + household_size + region + urban_rural + bmi + smoker + alcohol_freq + age*smoker, data = insurance)
+m2_life <- lm(log(annual_premium) ~ smoker + alcohol_freq + age*smoker, data = insurance)
 
-# Output ANOVA Table
-anova(m1_base, m2_full) %>%
-  kable(caption = "ANOVA Comparison: Baseline vs. Full Model", digits = 2) %>%
+m3_full <- lm(log(annual_premium) ~ age + sex + education + income + marital_status + household_size + region + urban_rural + bmi + smoker + alcohol_freq + age*smoker, data = insurance)
+
+
+# Output ANOVA Table 1
+anova(m1_base, m3_full) |>
+  kable(caption = "ANOVA Comparison: Baseline vs. Full Model", digits = 2) |>
+  kable_styling(latex_options = "hold_position")
+
+# Output ANOVA Table 2
+anova(m2_life, m3_full) |>
+  kable(caption = "ANOVA Comparison: Lifestyle vs. Full Model", digits = 2) |>
   kable_styling(latex_options = "hold_position")
 ```
-Interpretation: The ANOVA table shows a highly significant result for Model 2
 
+Interpretation: The ANOVA table shows a highly significant result for Model 3
+
+Comparing Baseline Demographics to Full Model
+H(null): The additional coefficients (slope) are all zero; therefore, additional variables (lifestlye choices) do not contribute to model fit
+H(alternative): The additional coefficients (slope) are not all zero; therefore, additional variables (lifestlye choices) do contribute to model fit
 - F-Statistic: The large F-value (461.19) implies that the variance explained by the added lifestyle variables is significantly greater than what we would expect by random chance
 - P-Value (< 0.001): Since $p < 0.05$, we reject the null hypothesis. We can conclude that adding Smoking, BMI, and Alcohol significantly improves the model fit over demographics alone. Note: The NA in the first row is normal, as it represents the baseline model against which the second model is compared.
+
+Comparing Lifestyle Choices to Full Model
+H(null): The additional coefficients (slope) are all zero; therefore, additional variables (demographics) do not contribute to model fit
+H(alternative): The additional coefficients (slope) are not all zero; therefore, additional variables (demographics) do contribute to model fit
+- F-Statistic: The large F-value (139.44) implies that the variance explained by the added demographic variables is significantly greater than what we would expect by random chance
+- P-Value (< 0.001): Since $p < 0.05$, we reject the null hypothesis. We can conclude that adding Smoking, BMI, and Alcohol significantly improves the model fit over demographics alone. Note: The NA in the first row is normal, as it represents the baseline model against which the second model is compared.
+
+As df values are not the same, the f value cannot be used to directly compare the impact of the added demographic variables.
+
+## Comparison of R^2 Values
+
+```{r}
+R21 <- summary(m1_base)$r.squared
+R22 <- summary(m2_life)$r.squared
+R23 <- summary(m3_full)$r.squared
+
+dfr2 <- data.frame(
+  Category = c("R\u00B2 Demographic", "R\u00B2 Lifestyle", "Full Model"),
+  R2_Value = c(R21, R22, R23)
+)
+
+kable(dfr2, caption = "R\u00B2 Values of Demographic, Lifestyle, and Full Model")
+
+R231 <- R23 - R21
+R232 <- R23 - R22
+
+dfr2c <- data.frame(
+  Category = c("ΔR\u00B2 (demographic, full)", "ΔR\u00B2 (lifestyle, full)"),
+  R2_Value = c(R231, R232)
+)
+
+kable(dfr2c, caption = "ΔR\u00B2 of Demographic and Lifestyle Model Compared to Full Model")
+
+```
+More substantial change in RR\u00B2 between demographic and full model (compared to change between lifestyle and full model) suggests that the addition of lifestyle factors has a more significant impact on the fit of the model than the addition of demographic factors. In particular, this difference in ΔR\u00B2 implies that the addition of lifestyle variables leads to a more substantial increase sum of the squared residuals.
 
 ## 4.2 Regression Coefficients
 Table 3 presents the coefficients for the Full Model. Since the response is log-transformed, coefficients ($\beta$) can be interpreted as an approximate $100 \times \beta \%$ change in the premium for small values.
 
 ```{r}
 # Tidy results for the main lifestyle factors
-tidy(m2_full) %>%
-  filter(str_detect(term, "bmi|smoker|alcohol|age:smoker")) %>%
+tidy(m3_full) |>
+  filter(str_detect(term, "bmi|smoker|alcohol|age:smoker")) |>
   mutate(
     term = str_replace_all(term, "smokerCurrent", "Smoker: Current"),
     term = str_replace_all(term, "smokerFormer", "Smoker: Former"),
@@ -187,9 +247,9 @@ tidy(m2_full) %>%
     term = str_replace_all(term, "bmi", "BMI"),
     estimate = round(estimate, 5),
     p.value = scales::pvalue(p.value)
-  ) %>%
-  select(Predictor = term, Estimate = estimate, `Std. Error` = std.error, `P-Value` = p.value) %>%
-  kable(caption = "Coefficients for Modifiable Lifestyle Factors (Model 2)") %>%
+  ) |>
+  select(Predictor = term, Estimate = estimate, `Std. Error` = std.error, `P-Value` = p.value) |>
+  kable(caption = "Coefficients for Modifiable Lifestyle Factors (Model 2)") |>
   kable_styling(latex_options = "hold_position")
 ```
 
@@ -210,13 +270,16 @@ To ensure the validity of our inference, we examined the residual plots for Mode
 
 - Normality of Residuals: Figure 4 (Right) shows the Normal Q-Q plot. The points (circles) adhere closely to the diagonal line for the majority of observations. However, the tails deviate upward. This "heavy-tailed" behavior indicates that our model slightly underestimates the premiums for the most extreme, high-cost outliers. Given the large sample size ($N \approx 100,000$), the Central Limit Theorem ensures that our coefficient estimates remain unbiased despite this minor deviation.
 
+
 ```{r}
 #| label: fig-diagnostics
 #| #| fig-pos: 'H'
 
 par(mfrow = c(1, 2))
-plot(m2_full, which = 1, main = "Residuals vs Fitted")
-plot(m2_full, which = 2, main = "Normal Q-Q")
+plot(m3_full, which = 1, main = "Residuals vs Fitted")
+plot(m3_full, which = 2, main = "Normal Q-Q")
+
+
 ```
 # 5. Discussion
 
