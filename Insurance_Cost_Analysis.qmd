@@ -91,57 +91,37 @@ insurance |>
   kable_styling(latex_options = "hold_position")
 ```
 ## 2.2 Distribution and Transformation
-Linear regression relies on the assumption of normality in the error terms. As shown in Figure 1 (Left), the raw annual premium distribution is heavily right-skewed. To satisfy the normality assumption, we applied a log-transformation (ln(*Premium*)). Figure 1 (Right) confirms that the transformed variable approximates a normal distribution, validating the use of log-linear regression [2].
+Linear regression relies on the assumption of normality in the error terms. To satisfy the normality assumption, we applied a log-transformation (ln(*Premium*)). Figure 1 (Right) confirms that the transformed variable approximates a normal distribution, validating the use of log-linear regression [2].
 
-After fitting the models, we generate residual plots for each. Observing the plots, we can see that for each of the three models, there seems to be a roughly constant variance no matter the value of the predictor. (ish?) However, linearity of the parameters is clearly not fufilled as the points are not distributed symetrically around the x axis.
+```{r}
+# Fit Models
+m1_base <- lm(log(annual_premium) ~ age + sex + education + income + marital_status + household_size + region + urban_rural, data = insurance)
 
-##do we need to address this?
+m2_life <- lm(log(annual_premium) ~ smoker + alcohol_freq + age*smoker, data = insurance)
+
+m3_full <- lm(log(annual_premium) ~ age + sex + education + income + marital_status + household_size + region + urban_rural + bmi + smoker + alcohol_freq + age*smoker, data = insurance)
+```
 
 ```{r}
 #| label: fig-normality
 #| #| fig-pos: 'H'
 
-p1 <- ggplot(insurance, aes(x = annual_premium)) +
+h1 <- ggplot(data = m1_base, mapping = aes(x = m1_base$residuals)) +
   geom_histogram(bins = 40, fill = "orange", color = "white") +
-  labs(title = "Raw Distribution (Skewed)", x = "Annual Premium ($)", y = "Count") +
+  labs(title = "Residual:\n Baseline Category", x = "Residuals", y = "Count") +
   theme_minimal()
 
-p2 <- ggplot(insurance, aes(x = log(annual_premium))) +
-  geom_histogram(bins = 40, fill = "lightblue", color = "white") +
-  labs(title = "Log-Transformed (Normal)", x = "Log(Premium)", y = "Count") +
+h2 <- ggplot(data = m2_life, mapping = aes(x = m2_life$residuals)) +
+  geom_histogram(bins = 40, fill = "blue", color = "white") +
+  labs(title = "Residual:\n Modifiable Category", x = "Residuals", y = "Count") +
   theme_minimal()
 
-grid.arrange(p1, p2, ncol = 2)
+h3 <- ggplot(data = m3_full, mapping = aes(x = m3_full$residuals)) +
+  geom_histogram(bins = 40, fill = "green", color = "white") +
+  labs(title = "Residual:\n Both Categories", x = "Residuals", y = "Count") +
+  theme_minimal()
 
-# Fit Models
-m1_base <- lm(log(annual_premium) ~ age + sex + education + income + marital_status + household_size + region + urban_rural, data = insurance)
-
-m2_life <- lm(log(annual_premium) ~ smoker + alcohol_freq, data = insurance)
-
-m3_full <- lm(log(annual_premium) ~ age + sex + education + income + marital_status + household_size + region + urban_rural + bmi + smoker + alcohol_freq + age*smoker, data = insurance)
-
-# Check for linearity and homoscedasticity of errors
-
-pr1 <- ggplot(data = m1_base, mapping = aes(x = m1_base$fitted.values, y = m1_base$residuals)) + 
-  geom_point() + 
-  labs(x = "Fitted values", y = "Residuals",
-       title = "...") + 
-  geom_hline(yintercept = 0, color = "red") # add a horizontal red line at 0
-
-pr2 <- ggplot(data = m2_life, mapping = aes(x = m2_life$fitted.values, y = m2_life$residuals)) + 
-  geom_point() + 
-  labs(x = "Fitted values", y = "Residuals",
-       title = "...") + 
-  geom_hline(yintercept = 0, color = "red") # add a horizontal red line at 0
-
-pr3 <- ggplot(data = m3_full, mapping = aes(x = m3_full$fitted.values, y = m3_full$residuals)) + 
-  geom_point() + 
-  labs(x = "Fitted values", y = "Residuals",
-       title = "...") + 
-  geom_hline(yintercept = 0, color = "red") # add a horizontal red line at 0
-
-grid.arrange(pr1, pr2, pr3, ncol = 3)
-
+grid.arrange(h1, h2, h3, ncol = 3)
 ```
 
 ## 2.3 Visualizing the "Smoking Penalty" and Interaction
@@ -200,17 +180,9 @@ We utilize Analysis of Variance (ANOVA) to statistically compare models 1 and 2 
 
 ## 4.1 ANOVA Model Comparison
 
-We performed an ANOVA F-test to compare the explanatory power of Model 1 (Demographics) versus Model 2 (Full).
+We performed an ANOVA F-test to compare the explanatory power of Model 1 (Demographics) versus Model 2 (Lifestyle) versues Model 3 (Full).
 
 ```{r}
-grid.arrange(p1, p2, ncol = 2)
-
-ggplot(data.frame(sample = residuals(m3_full)), aes(sample = sample)) +
-  stat_qq(color = "black") +
-  stat_qq_line(color = "red", linetype = "dashed") +
-  labs(title = "Q-Q Plot for baseline factors",
-       x = "Theoretical Quantiles", y = "Sample Quantiles")
-
 # Output ANOVA Table 1
 anova(m1_base, m3_full) |>
   kable(caption = "ANOVA Comparison: Baseline vs. Full Model", digits = 2) |>
@@ -312,11 +284,6 @@ To ensure the validity of our inference, we examined the residual plots for Mode
 par(mfrow = c(1, 2))
 plot(m3_full, which = 1, main = "Residuals vs Fitted")
 plot(m3_full, which = 2, main = "Normal Q-Q")
-
-ggplot(data = m3_full, mapping = aes(x = m3_full$residuals)) +
-  geom_histogram(color = "black") 
-  labs(title = "Histogram of Residuals",
-       x = "Residual", y = "Count")
 
 
 ```
