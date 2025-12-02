@@ -137,23 +137,6 @@ ggplot(insurance, aes(x = age, y = log(annual_premium), color = smoker)) +
   scale_color_brewer(palette = "Set1")
 ```
 
-## 2.4 BMI Trends
-We also examined the relationship between BMI and cost. Figure 3 shows a positive (though weak) linear relationship between BMI and the log of insurance premiums. This still allows to consider BMI as a relevant predictor to include in the "Modifiable Lifestyle" category.
-
-```{r}
-#| label: fig-bmi
-#| fig-pos: 'H'
-#| fig-cap: "Relationship between BMI and log-transformed annual premium, showing a weak positive association."
-
-ggplot(insurance, aes(x = bmi, y = log(annual_premium))) +
-  geom_hex(bins = 50) +
-  geom_smooth(method = "lm", color = "red", linetype = "dashed") +
-  scale_fill_gradient(low = "lightblue", high = "darkblue") +
-  labs(title = "Higher BMI Correlates with Higher Premiums",
-       x = "Body Mass Index (BMI)",
-       y = "Log(Annual Premium)") +
-  theme_minimal()
-```
 
 # 3. Methodology
 
