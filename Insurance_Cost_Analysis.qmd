@@ -171,6 +171,8 @@ To ensure the validity of our inference, we examined the residual plots for the 
 
 - Normality of Residuals: (Right) shows the Normal Q-Q plot. The points (circles) adhere closely to the diagonal line for a large number of observations. However, the tails deviate upward. This  behavior indicates that our model slightly underestimates the premiums for the most extreme, high-cost outliers. Given the large sample size ($N \approx 100,000$), the Central Limit Theorem ensures that our coefficient estimates remain unbiased despite this deviation [2].
 
+- Independence: One key source of this dataset is the National Health Interview survey; this survey is conducted on a voluntary basis. Despite a small risk of self selection bias, due to the large sample size, it's reasonable to assume independence for our model.
+
 
 ```{r}
 #| label: fig-diagnostics
@@ -281,7 +283,6 @@ Key Findings:
 3. Alcohol: The p-values for alcohol frequency are $> 0.05$. This suggests that, unlike smoking and BMI, self-reported alcohol frequency is not a statistically significant predictor of insurance premiums in this dataset.
 
 4. Interaction (Age $\times$ Smoker): The significant interaction term ($p = 0.002$) confirms our EDA finding. This positive coefficient ($\beta = 0.00087$)) means the premium gap between smokers and non-smokers widens as age increases. For every additional year of age, the "smoker penalty" increases.
-
 
 # 5. Discussion
 
