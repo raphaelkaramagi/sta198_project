@@ -50,26 +50,20 @@ insurance <- na.omit(insurance)
 ```
 
 # 1. Introduction
-Health insurance premiums in the United States are determined by complex actuarial algorithms. For the consumer, the weighting of these factors is often hard to interpret. While some determinants of cost are **Fixed Demographic Factors** (Age, Region, Sex), others are **Modifiable Lifestyle Choices** (Smoking, BMI, Alcohol Consumption).
+Within 2023, healthcare spending in the United States increased by 7.5%, totaling to 4.9 trillion USD; this healthcare spending increase parallels increases in the cost of health insurance. Recent rates of change in health insurance premium cost has exceeded that of wages and inflation, making it harder for individuals to afford health insurance. 
+However, health insurance costs vary from one individual to another; factors such as age, location and tobacco use are legally allowed to increase the cost of one's premium. 
 
-Understanding the distinction between these categories is vital. If premiums are driven primarily by demographics, consumers have little impact over their costs. However, if lifestyle factors are significant drivers, individuals can mitigate their financial burden through behavioral changes.
+However, individuals with other pre-existing health risks may themselves select costlier healthcare plans that provide greater coverage. Further, other variables may affect tobacco use. Overall, we can categorize factors that potentially drive healthcare cost into two categories: modifiable lifestyle choices and baseline demographic/socioeconomic factors. 
 
-In the United States, health insurance costs rank amongst the highest in the world. Within the year 2023, healthcare spending increased by 7.5%, totaling up to 4.9 trillion USD (ama). This consequently drives up the price of health insurance premiums. Recently, the rate of change in health insurance premiums has exceeded that of wages and inflation, making it harder for individuals to afford health insurance. However, health insurance costs vary from one individual to another; factors such age, location, and tobacco use are legally allowed increase the cost of one's premium. Further, individuals with other pre-existing health risks may themselves select costlier healthcare plans that provide greater coverage.
+Many studies have investigated the role of these variables individually. We try to fill a research gap by investigating how much premium prices can be attributed by baseline demographic/socioeconomic factors (DRF) versus modifiable lifestyle factors (MLC); does one category have a more substantial effect on insurance cost variance? The results indicate how institutions and individuals can make healthcare more affordable. For instance, if insurance cost variance is heavily driven by MLC, customers can lower prices by modifying behaviors. However, if insurance cost is heavily driven by DRF, policy changes may be required to lower costs.
 
-Consequently, various factors may contribute to the cost of one's premium. However, these factors may be split into two groups: modifiable lifestyle choices and baseline demographic/socioeconomic factors. This study seeks to figure out what proportion of insurance cost variance is attributable to modifiable lifestyle choices versus baseline demographic and socioeconomic risk factors. Being able to see these results can inform the public on the factors they should be paying attention to if they want to lower their premiums. For example, if insurance cost variance is heavily driven by modifiable lifestyle choices such as smoking or alcohol consumption, prices are determined heavily on the behaviors of the customer. However, if the insurance cost variance is more controlled by the socioeconomic factors, then there must be a change in the system in order to lower costs.
+We consider three variables representing MLC: smoking status (current, former, never), alcohol consumption frequency (never, occasionally, weekly, daily), and BMI. We consider six variables representing DRF, age, sex, highest education level, income, marital status, and household size.
 
-It is known that an individual's premium is determined by their risk score; what goes into the calculation of a risk score and their weights contributing to the risk score can get more complex. According to the health care law, insurance companies can only use five factors to determine health insurance premiums: age, location, tobacco use, individual vs. family enrollment, and type of plan (healthcare). For example, it is known that the average elderly individual paid three times more for health insurance compared to the average working age adult (bls). However, there could be underlying factors that could go into one's risk score. For instance, getting company-sponsored health insurance can present incentives by participating in workplace wellness programs, which could mean other factors could sway premiums (KFF). A lot of previous findings present how individual factors can affect health insurance costs; the gap we are trying to bridge is to find how much premium prices can be attributed by baseline demographic/socioeconomic factors versus modifiable lifestyle factors. 
+Dataset: We utilize the Medical Insurance Cost Prediction dataset from Kaggle [1]. The dataset contains approximately 100,000 observations including demographic details (Age, Sex, Income) and lifestyle indicators (Smoking status, BMI, Alcohol frequency). Constituent data was derived from three main sources: Centers for Disease Control and Prevention (CDC), U.S. Department of Health & Human Services (HHS), and Centers for Medicare & Medicaid Services (CMS). 
 
-For the specific variables considered, within modifiable lifestyle choices, there is smoking status (current, former, or never), frequency of alcohol consumption (Never, occasionally, weekly, daily), and BMI. As for the baseline demographic/socioeconomic factors category, it contains age, sex, highest education level, income, marital status, and household size. The dataset containing all of these variables was obtained from Kaggle; the Kaggle dataset got it's data from 3 main sources: Centers for Disease Control and Prevention (CDC), U.S. Department of Health & Human Services (HHS), and Centers for Medicare & Medicaid Services (CMS). In the scope of our research question, the dataset contained an excess amount of information; thus, those columns were filtered out and we only looked at the variables apart of the two main categories. Throughout the paper, we will run regressions and visualize the data in order to see how the two categories influence the variance of medical insurance costs. 
-
-Research Question: What proportion of insurance cost variance is attributable to modifiable lifestyle choices versus baseline demographic and socioeconomic risk factors?
+Research Question: **How much can premium prices be attributed by baseline demographic/socioeconomic factors (DRF) versus modifiable lifestyle factors (MLC)?**
 
 
-Research Question:
-**To what extent do modifiable lifestyle habits (Smoking, BMI, Alcohol) explain the variance in insurance premiums compared to fixed demographic factors?**
-
-The Data:
-We utilize the Medical Insurance Cost Prediction dataset from Kaggle [1]. The dataset contains approximately 100,000 observations including demographic details (Age, Sex, Income) and lifestyle indicators (Smoking status, BMI, Alcohol frequency).
 
 
 # 2. Exploratory Data Analysis
@@ -91,37 +85,34 @@ insurance |>
   kable_styling(latex_options = "hold_position")
 ```
 ## 2.2 Distribution and Transformation
-Linear regression relies on the assumption of normality in the error terms. To satisfy the normality assumption, we applied a log-transformation (ln(*Premium*)). Figure 1 confirms that the transformed variable approximates a normal distribution for the residuals, validating the use of log-linear regression [2].
+Linear regression assumes approximately normal residuals with constant variance. When the response variable is heavily right-skewed, these assumptions are typically violated. As shown in Figure 1 (Left), the raw annual premium distribution exhibits substantial right-skewness. We therefore applied a log-transformation, ln(Premium), which produces a more symmetric distribution (Figure 1, Right). This transformation typically improves residual normality and homoscedasticity, which we verify in Section 4.2.
 
 ```{r}
 # Fit Models
 m1_base <- lm(log(annual_premium) ~ age + sex + education + income + marital_status + household_size + region + urban_rural, data = insurance)
 
-m2_life <- lm(log(annual_premium) ~ smoker + alcohol_freq + age*smoker, data = insurance)
+m2_life <- lm(log(annual_premium) ~ smoker + alcohol_freq + bmi, data = insurance)
 
 m3_full <- lm(log(annual_premium) ~ age + sex + education + income + marital_status + household_size + region + urban_rural + bmi + smoker + alcohol_freq + age*smoker, data = insurance)
 ```
 
 ```{r}
-#| label: fig-normality
-#| #| fig-pos: 'H'
+#| label: fig-distribution
+#| fig-cap: "Distribution of annual premiums before and after log-transformation"
 
-h1 <- ggplot(data = m1_base, mapping = aes(x = m1_base$residuals)) +
-  geom_histogram(bins = 40, fill = "orange", color = "white") +
-  labs(title = "Residual:\n Baseline Category", x = "Residuals", y = "Count") +
+p1 <- ggplot(insurance, aes(x = annual_premium)) +
+  geom_histogram(bins = 50, fill = "orange", color = "white") +
+  labs(title = "Raw Distribution (Skewed)", 
+       x = "Annual Premium ($)", y = "Count") +
   theme_minimal()
 
-h2 <- ggplot(data = m2_life, mapping = aes(x = m2_life$residuals)) +
-  geom_histogram(bins = 40, fill = "blue", color = "white") +
-  labs(title = "Residual:\n Modifiable Category", x = "Residuals", y = "Count") +
+p2 <- ggplot(insurance, aes(x = log(annual_premium))) +
+  geom_histogram(bins = 50, fill = "steelblue", color = "white") +
+  labs(title = "Log-Transformed (Normal)", 
+       x = "Log(Premium)", y = "Count") +
   theme_minimal()
 
-h3 <- ggplot(data = m3_full, mapping = aes(x = m3_full$residuals)) +
-  geom_histogram(bins = 40, fill = "green", color = "white") +
-  labs(title = "Residual:\n Both Categories", x = "Residuals", y = "Count") +
-  theme_minimal()
-
-grid.arrange(h1, h2, h3, ncol = 3)
+grid.arrange(p1, p2, ncol = 2)
 ```
 
 ## 2.3 Visualizing the "Smoking Penalty" and Interaction
@@ -132,6 +123,8 @@ The Green Line (Current Smokers) shows a higher intercept, indicating a higher b
 ```{r}
 #| label: fig-interaction
 #| #| fig-pos: 'H'
+#| #| fig-cap: "Log-premium by age, stratified by smoking status. The steeper slope for current smokers suggests an interaction effect."
+
 
 ggplot(insurance, aes(x = age, y = log(annual_premium), color = smoker)) +
   geom_point(alpha = 0.1, size = 0.5) +
@@ -150,6 +143,7 @@ We also examined the relationship between BMI and cost. Figure 3 shows a positiv
 ```{r}
 #| label: fig-bmi
 #| #| fig-pos: 'H'
+#| #| fig-cap: "Relationship between BMI and log-transformed annual premium, showing a weak positive association."
 
 ggplot(insurance, aes(x = bmi, y = log(annual_premium))) +
   geom_hex(bins = 50) +
@@ -169,14 +163,33 @@ Model 1: Baseline Demographics This model accounts for fixed factors the individ
 $$ \ln(Y) = \beta_0 + \beta_{Age} + \beta_{Sex} + \beta_{Region} + \beta_{Income} + \beta_{MaritalStatus} + \beta_{Urban/Rural} + \beta_{Education} + \epsilon $$
 
 Model 2: Lifestyle This model accounts for only modifiable behaviors that the individual can easily change
-$$ \ln(Y) =  \beta_0 + \beta_{Smoker} + \beta_{Alcohol} + \epsilon $$
+$$ \ln(Y) =  \beta_0 + \beta_{Smoker} + \beta_{Alcohol} + \beta_{BMI} +  \epsilon $$
 
 Model 3: Full Model (Demographics + Lifestyle) This model adds modifiable behaviors. Based on the interaction observed in Section 2.3, we include an interaction term for Age and Smoking. 
-$$ \ln(Y) =  \beta_{BMI} + \beta_{Smoker} + \beta_{Alcohol} + (\beta_{Age} \times \beta_{Smoker}) + \epsilon $$
+$$ \ln(Y) =  \beta_{Age} + \beta_{Sex} + \beta_{Region} + \beta_{Income} + \beta_{MaritalStatus} + \beta_{Urban/Rural} + \beta_{Education} + \beta_{Smoker} + \beta_{Alcohol} + \beta_{BMI}  + (\beta_{Age} \times \beta_{Smoker}) +  \epsilon $$
 
 We utilize Analysis of Variance (ANOVA) to statistically compare models 1 and 2 with the Full Model. The F-test in the ANOVA will determine if the reduction in the Residual Sum of Squares (RSS) provided by the lifestyle/demographic variables is statistically significant.
 
 # 4. Results
+
+## 4.1 Diagnostics and Assumptions Checking
+To ensure the validity of our inference, we examined the residual plots for Model 2.
+
+- Linearity and Homoscedasticity: Figure 4 (Left) displays the Residuals vs. Fitted values. The points are randomly distributed around the horizontal zero line without a distinct funnel shape. This indicates that the assumption of homoscedasticity (constant variance of errors) is largely met.
+
+- Normality of Residuals: Figure 4 (Right) shows the Normal Q-Q plot. The points (circles) adhere closely to the diagonal line for the majority of observations. However, the tails deviate upward. This "heavy-tailed" behavior indicates that our model slightly underestimates the premiums for the most extreme, high-cost outliers. Given the large sample size ($N \approx 100,000$), the Central Limit Theorem ensures that our coefficient estimates remain unbiased despite this minor deviation.
+
+
+```{r}
+#| label: fig-diagnostics
+#| #| fig-pos: 'H'
+
+par(mfrow = c(1, 2))
+plot(m3_full, which = 1, main = "Residuals vs Fitted")
+plot(m3_full, which = 2, main = "Normal Q-Q")
+
+
+```
 
 ## 4.1 ANOVA Model Comparison
 
@@ -237,7 +250,7 @@ kable(dfr2c, caption = "ΔR\u00B2 of Demographic and Lifestyle Model Compared to
 ```
 More substantial change in RR\u00B2 between demographic and full model (compared to change between lifestyle and full model) suggests that the addition of lifestyle factors has a more significant impact on the fit of the model than the addition of demographic factors. In particular, this difference in ΔR\u00B2 implies that the addition of lifestyle variables leads to a more substantial increase sum of the squared residuals.
 
-## 4.2 Regression Coefficients
+## 4.3 Regression Coefficients
 Table 3 presents the coefficients for the Full Model. Since the response is log-transformed, coefficients ($\beta$) can be interpreted as an approximate $100 \times \beta \%$ change in the premium for small values.
 
 ```{r}
@@ -269,24 +282,7 @@ Key Findings:
 
 4. Interaction (Age $\times$ Smoker): The significant interaction term ($p = 0.002$) confirms our EDA finding. The slope of the cost curve is steeper for smokers. This means the dollar-cost of smoking increases as the individual ages.
 
-## 4.3 Diagnostics and Assumptions Checking
-To ensure the validity of our inference, we examined the residual plots for Model 2.
 
-- Linearity and Homoscedasticity: Figure 4 (Left) displays the Residuals vs. Fitted values. The points are randomly distributed around the horizontal zero line without a distinct funnel shape. This indicates that the assumption of homoscedasticity (constant variance of errors) is largely met.
-
-- Normality of Residuals: Figure 4 (Right) shows the Normal Q-Q plot. The points (circles) adhere closely to the diagonal line for the majority of observations. However, the tails deviate upward. This "heavy-tailed" behavior indicates that our model slightly underestimates the premiums for the most extreme, high-cost outliers. Given the large sample size ($N \approx 100,000$), the Central Limit Theorem ensures that our coefficient estimates remain unbiased despite this minor deviation.
-
-
-```{r}
-#| label: fig-diagnostics
-#| #| fig-pos: 'H'
-
-par(mfrow = c(1, 2))
-plot(m3_full, which = 1, main = "Residuals vs Fitted")
-plot(m3_full, which = 2, main = "Normal Q-Q")
-
-
-```
 # 5. Discussion
 
 
@@ -295,3 +291,7 @@ plot(m3_full, which = 2, main = "Normal Q-Q")
 [1] Kaggle. (2024). Medical Insurance Cost Prediction Dataset.
 [2] Wooldridge, J. M. (2015). Introductory Econometrics.
 [3] UVa Library. (2023). Hierarchical Linear Regression. https://library.virginia.edu/data/articles/hierarchical-linear-regression
+[4] American Medical Association. (2024). National Health Expenditure Data. https://www.ama-assn.org/
+[5] Bureau of Labor Statistics. (2023). Consumer Expenditure Survey: Health Insurance.
+[6] HealthCare.gov. (2024). How Insurance Companies Set Health Premiums. https://www.healthcare.gov/how-plans-set-your-premiums/
+[7] Kaiser Family Foundation. (2023). Employer Health Benefits Survey. https://www.kff.org/
