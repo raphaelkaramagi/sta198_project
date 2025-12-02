@@ -30,12 +30,12 @@ relevant_cols <- c(
 )
 
 # 2. Select Columns & Filter Zeros
-insurance <- insurance_raw %>%
-  select(all_of(relevant_cols)) %>%
+insurance <- insurance_raw |>
+  select(all_of(relevant_cols)) |>
   filter(annual_premium > 0)
 
 # 3. Factor Levels 
-insurance <- insurance %>%
+insurance <- insurance |>
   mutate(
     smoker = factor(smoker, levels = c("Never", "Former", "Current")),
     alcohol_freq = factor(alcohol_freq, levels = c("None", "Occasional", "Weekly", "Daily")),
@@ -79,15 +79,15 @@ We utilize the Medical Insurance Cost Prediction dataset from Kaggle [1]. The da
 Table 1 summarizes the central tendencies of the continuous variables. The substantial difference between the median (463.58 USD) and mean (582.32 USSD) premium indicates a right-skewed distribution, suggesting the presence of high-cost outliers.
 ```{r}
 #| label: tbl-summary
-insurance %>%
+insurance |>
   summarise(
     `Average Age` = mean(age),
     `Average BMI` = mean(bmi),
     `Median Premium` = median(annual_premium),
     `Mean Premium` = mean(annual_premium),
     `Max Premium` = max(annual_premium)
-  ) %>%
-  kable(caption = "Summary of Numerical Variables", digits = 2) %>%
+  ) |>
+  kable(caption = "Summary of Numerical Variables", digits = 2) |>
   kable_styling(latex_options = "hold_position")
 ```
 ## 2.2 Distribution and Transformation
@@ -107,7 +107,7 @@ p1 <- ggplot(insurance, aes(x = annual_premium)) +
   theme_minimal()
 
 p2 <- ggplot(insurance, aes(x = log(annual_premium))) +
-  geom_histogram(bins = 40, fill = "steelblue", color = "white") +
+  geom_histogram(bins = 40, fill = "lightblue", color = "white") +
   labs(title = "Log-Transformed (Normal)", x = "Log(Premium)", y = "Count") +
   theme_minimal()
 
@@ -213,13 +213,13 @@ ggplot(data.frame(sample = residuals(mB)), aes(sample = sample)) +
 
 
 # Output ANOVA Table 1
-anova(m1_base, m3_full) %>%
-  kable(caption = "ANOVA Comparison: Baseline vs. Full Model", digits = 2) %>%
+anova(m1_base, m3_full) |>
+  kable(caption = "ANOVA Comparison: Baseline vs. Full Model", digits = 2) |>
   kable_styling(latex_options = "hold_position")
 
 # Output ANOVA Table 2
-anova(m2_lifestyle, m3_full) %>%
-  kable(caption = "ANOVA Comparison: Lifestyle vs. Full Model", digits = 2) %>%
+anova(m2_life, m3_full) |>
+  kable(caption = "ANOVA Comparison: Lifestyle vs. Full Model", digits = 2) |>
   kable_styling(latex_options = "hold_position")
 ```
 
@@ -271,8 +271,8 @@ Table 3 presents the coefficients for the Full Model. Since the response is log-
 
 ```{r}
 # Tidy results for the main lifestyle factors
-tidy(m3_full) %>%
-  filter(str_detect(term, "bmi|smoker|alcohol|age:smoker")) %>%
+tidy(m3_full) |>
+  filter(str_detect(term, "bmi|smoker|alcohol|age:smoker")) |>
   mutate(
     term = str_replace_all(term, "smokerCurrent", "Smoker: Current"),
     term = str_replace_all(term, "smokerFormer", "Smoker: Former"),
@@ -282,9 +282,9 @@ tidy(m3_full) %>%
     term = str_replace_all(term, "bmi", "BMI"),
     estimate = round(estimate, 5),
     p.value = scales::pvalue(p.value)
-  ) %>%
-  select(Predictor = term, Estimate = estimate, `Std. Error` = std.error, `P-Value` = p.value) %>%
-  kable(caption = "Coefficients for Modifiable Lifestyle Factors (Model 2)") %>%
+  ) |>
+  select(Predictor = term, Estimate = estimate, `Std. Error` = std.error, `P-Value` = p.value) |>
+  kable(caption = "Coefficients for Modifiable Lifestyle Factors (Model 2)") |>
   kable_styling(latex_options = "hold_position")
 ```
 
