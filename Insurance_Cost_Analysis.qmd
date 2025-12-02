@@ -191,7 +191,7 @@ plot(m3_full, which = 2, main = "Normal Q-Q")
 
 ## 4.2 ANOVA Model Comparison
 
-To test whether the addition of DRF parameters and MLC parameters has an effect on squared residuals of the model, an ANOVA F-test is utilized. The DRF-only model was compared to the full model to assess the effect of MLC parameters; the MLC-only model was compared to the full model to assess the effect  
+To test whether the addition of Demographic parameters and Lifestyle parameters have an effect on squared residuals of the model, an ANOVA F-test is utilized. The Demographic-only model was compared to the full model to assess the effect of Modifiable parameters; the THe Modifiable-only model was compared to the full model to assess the effect  
 
 
 ```{r}
@@ -287,6 +287,19 @@ Key Findings:
 
 # 5. Discussion
 
+**5.1 Locus of Control: Lifestyle Matters More** 
+Our analysis reveals a crucial insight for consumers: Modifiable Lifestyle Choices (MLC) are stronger predictors of insurance premiums than Baseline Demographic Factors (DRF). In isolation, lifestyle choices explained ~3.4% of the variance, whereas demographics explained ~2.5%. This is empowering, as it suggests that the factors driving costs up (Smoking, BMI) are within the individual's control.
+
+**5.2 The "Double Penalty" of Smoking** 
+The identification of a statistically significant interaction between Age and Smoking provides a compelling financial incentive for cessation. A 50-year-old smoker does not just pay the standard "smoker fee"; they pay a compounded rate. This suggests that the "return on investment" for quitting smoking increases as one gets older.
+
+**5.3 Critique of Methodology and Data Validity** 
+Perhaps the most significant finding is what the model failed to explain. Our Full Model achieved an R² of only ~0.06. This implies 94% of the variance in insurance premiums is unexplained. This is likely due to Omitted Variable Bias [2]; premiums are heavily influenced by realized medical risk (e.g., Cancer history, Chronic conditions) which were absent from this dataset.
+
+Additionally, the Data Reliability must be critiqued. The dataset is synthetic (derived from CDC/CMS logic), meaning it may smooth over real-world complexities. The lack of significance for Alcohol Frequency may stem from reporting bias, as individuals often under-report substance use in surveys.
+
+**5.4 Alternative Techniques & Future Work** 
+While Linear Regression provided clear interpretability, the heavy tails in our residuals suggest that Quantile Regression or Generalized Linear Models (GLM) with a Gamma distribution might handle the high-cost outliers more effectively. Future research should prioritize obtaining real-world claims data containing specific medical history variables to improve predictive power.
 
 # 6. References
 
