@@ -50,21 +50,13 @@ insurance <- na.omit(insurance)
 ```
 
 # 1. Introduction
-Within 2023, healthcare spending in the United States increased by 7.5%, totaling to 4.9 trillion USD; this healthcare spending increase parallels increases in the cost of health insurance. Recent rates of change in health insurance premium cost has exceeded that of wages and inflation, making it harder for individuals to afford health insurance. 
-However, health insurance costs vary from one individual to another; factors such as age, location and tobacco use are legally allowed to increase the cost of one's premium. 
+Within 2023, healthcare spending in the United States increased by 7.5%, totaling to 4.9 trillion USD; this healthcare spending increase parallels increases in the cost of health insurance (American Medical Association). Recent rates of change in health insurance premium cost has exceeded that of wages and inflation, making it harder for individuals to afford health insurance. However, health insurance costs vary from one individual to another; factors such as age, location and tobacco use are legally allowed to increase the cost of one's premium. These factors can be split into two groups: modifiable lifestyle factors (MLC) and demographic/socioeconomic factors
 
-However, individuals with other pre-existing health risks may themselves select costlier healthcare plans that provide greater coverage. Further, other variables may affect tobacco use. Overall, we can categorize factors that potentially drive healthcare cost into two categories: modifiable lifestyle choices and baseline demographic/socioeconomic factors. 
-
-Many studies have investigated the role of these variables individually. We try to fill a research gap by investigating how much premium prices can be attributed by baseline demographic/socioeconomic factors (DRF) versus modifiable lifestyle factors (MLC); does one category have a more substantial effect on insurance cost variance? The results indicate how institutions and individuals can make healthcare more affordable. For instance, if insurance cost variance is heavily driven by MLC, customers can lower prices by modifying behaviors. However, if insurance cost is heavily driven by DRF, policy changes may be required to lower costs.
+From the Affordable Care Act, the five factors that effect health insurance premiums are age, location, tobacco use, individual vs family enrollment, and the plan category (Healthcare.gov). However, there could be more underlying factors that can affect the 5 stated variables. We try to fill a research gap by investigating how much premium prices can be attributed by baseline demographic/socioeconomic factors (DRF) versus modifiable lifestyle factors (MLC); does one category have a more substantial effect on insurance cost variance? The results indicate how institutions and individuals can make healthcare more affordable. For instance, if insurance cost variance is heavily driven by MLC, customers can lower prices by modifying behaviors. However, if insurance cost is heavily driven by DRF, policy changes may be required to lower costs.
 
 We consider three variables representing MLC: smoking status (current, former, never), alcohol consumption frequency (never, occasionally, weekly, daily), and BMI. We consider six variables representing DRF, age, sex, highest education level, income, marital status, and household size.
 
-Dataset: We utilize the Medical Insurance Cost Prediction dataset from Kaggle [1]. The dataset contains approximately 100,000 observations including demographic details (Age, Sex, Income) and lifestyle indicators (Smoking status, BMI, Alcohol frequency). Constituent data was derived from three main sources: Centers for Disease Control and Prevention (CDC), U.S. Department of Health & Human Services (HHS), and Centers for Medicare & Medicaid Services (CMS). 
-
-Research Question: **How much can premium prices be attributed by baseline demographic/socioeconomic factors (DRF) versus modifiable lifestyle factors (MLC)?**
-
-
-
+For our dataset, we utilize the Medical Insurance Cost Prediction dataset from Kaggle [1]. The dataset contains approximately 100,000 observations including demographic details (Age, Sex, Income) and lifestyle indicators (Smoking status, BMI, Alcohol frequency). Constituent data was derived from three main sources: Centers for Disease Control and Prevention (CDC), U.S. Department of Health & Human Services (HHS), and Centers for Medicare & Medicaid Services (CMS). 
 
 # 2. Exploratory Data Analysis
 
