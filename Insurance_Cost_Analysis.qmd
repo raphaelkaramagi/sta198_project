@@ -283,6 +283,29 @@ Key Findings:
 
 # 5. Discussion
 
+## 5.1 Interpretation of Results
+
+The analysis shows that both lifestyle choices and demographic factors significantly influence insurance premiums, though neither explains most of the variation. The full model achieves an R² of 0.060, meaning it explains only 6% of premium differences. Demographics alone explain 2.5% of variance (R² = 0.025), while lifestyle factors alone explain 3.4% (R² = 0.034). This suggests lifestyle choices have a slightly larger impact than demographics, but the difference is modest. When added to the demographic model, lifestyle variables increase R² by 0.035 (ΔR² = 0.0347). When demographics are added to the lifestyle model, R² increases by 0.025 (ΔR² = 0.0254).
+
+Smoking emerged as the strongest predictor among lifestyle factors. Current smokers face approximately 22% higher premiums compared to never-smokers, holding other factors constant. The significant age-smoking interaction (p = 0.002) confirms that this penalty compounds as people age, with an additional 0.087% increase per year of age for current smokers. Former smokers also pay about 6.4% more than never-smokers. BMI showed a small but significant positive relationship (coefficient = 0.0056, p < 0.001), meaning each additional BMI point associates with roughly a 0.56% premium increase. Alcohol consumption did not predict premiums (p > 0.05 for all categories). 
+
+This aligns with the Affordable Care Act as alcohol consumption was not one of the factors that could determine premiums.
+The extremely low overall R² indicates that 94% of premium variation comes from factors not captured in this dataset. Plan characteristics like deductible amounts, coverage levels, provider networks, and specific insurer pricing strategies likely matter far more than the individual characteristics measured here.
+
+## 5.2 Methodological Limitations
+Several issues limit the strength of these conclusions. First, the design of the study is unable to determine causation. While smokers pay higher premiums, this could reflect insurers charging more for risky behaviors, or it could reflect people who expect high medical costs choosing more expensive comprehensive plans. Second, the dataset lacks crucial information about what kind of insurance plans people have. Without knowing plan types, coverage levels, or which insurance companies people use, the analysis does not take into consideration factors that probably drive most cost differences.
+
+Third, relying on self-reported data for BMI, smoking, and especially alcohol consumption introduces measurement error. People may underreport unhealthy behaviors, which would weaken the observed relationships. Fourth, the model underestimates premiums for the highest-cost individuals, as shown in the Q-Q plot. Since affordability concerns often focus on people facing the highest costs, this limitation matters for policy implications.
+
+## 5.3 Recommendations for Improvement
+
+Future research should include plan-level details like deductibles, copays, and network breadth. Additionally, longitudinal data following the same people over time would help determine whether quitting smoking or losing weight actually reduces premiums. This type of design would control for individual differences that do not change over time. More detailed geographic information beyond basic regions would capture state regulations, local competition, and cost of living differences. Furthermore, testing additional interactions, particularly between income and lifestyle factors, would reveal whether premium penalties for unhealthy behaviors disproportionately affect lower-income individuals. Finally, linking this data to actual healthcare utilization records would show whether premium differences reflect real risk or just plan selection patterns.
+
+## 5.4 Implications
+
+The results suggest that while lifestyle choices matter for insurance costs, they explain far less variation than expected. For individuals, quitting smoking offers the clearest way to reduce premiums, with savings that grow over time. However, the very low explanatory power of all individual characteristics combined (only 6%) suggests that insurance costs are driven overwhelmingly by plan design and market factors rather than personal health behaviors. This supports policies that limit how much insurers can vary premiums based on health status and suggests that addressing affordability requires focusing primarily on plan structures and market regulations rather than individual behavior change alone.
+
+
 
 
 
