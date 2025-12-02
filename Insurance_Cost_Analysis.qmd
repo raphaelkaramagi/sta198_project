@@ -203,13 +203,19 @@ anova(m2_life, m3_full) |>
 ```
 
 **Testing the Addition of Demographic Factors**
+
 **H(null)**: \beta_{Age} = \beta_{Sex} =  \beta_{Region} = \beta_{Income} = \beta_{MaritalStatus} = \beta_{Urban/Rural} = \beta_{Education} = 0
-**H(alt)**: At least one of  \beta_{Age}, \beta_{Sex}, \beta_{Region}, \beta_{Income}, \beta_{MaritalStatus}, \beta_{Urban/Rural},  \beta_{Education} ≠ 0
+
+**H(alt)**: At least one of  \beta_{Age}, \beta_{Sex}, \beta_{Region}, \beta_{Income}, \beta_{MaritalStatus}, \beta_{Urban/Rural},  \beta_{Education} != 0
+
 We compared the Lifestyle-only model against the Full model to see if adding Demographics significantly reduced the squared residuals. The F-test yielded an F-statistic of 461.19 and a p-value displaying 0, clearly less than <0.05. We reject the null hypothesis that all demographic coefficients are zero. Therefore, variation at least one of the socioeconomic/demographic factors seems to help explain the variation in the log(monthly premium); the addition of DRF helps reduce the squared residuals and provide statistically significant explanatory power.
 
 **Testing the Addition of Modifiable Lifestyle Factors** 
-**H(null)**: \beta_{Smoker} = \beta_{Alcohol} =  \beta_{bmi} = 0
-**H(alt)**: At least one of \beta_{Smoker},  \beta_{Alcohol},  \beta_{bmi} ;  ≠ 0
+
+**H(null)**: $\beta_{Smoker} = \beta_{Alcohol} =  \beta_{BMI} = 0$
+
+**H(alt)**: At least one of $\beta_{Smoker},  \beta_{Alcohol},  \beta_{BMI}  ≠ 0$
+
 We compared the Demographic-only model against the Full model to see if adding Lifestyle factors improved the fit. The F-test yielded an F-statistic of 128.88 and a p-value displaying 0, clearly less than <0.05. We reject the null hypothesis that lifestyle coefficients are zero. Therefore, variation at least one of the modifiable life choices seems to help explain the variation in the log(annual premium); This confirms that modifiable choices (Smoking, BMI) also significantly explain variation in premiums.
 
 The ANOVA tests conclude that the addition of MLC parameters to a DRF model may help explain the variation in the log(annual premium). However, as the degrees of freedom are not the same for each ANOVA test, the F value cannot be used directly to compare the impact of the added Demographic/Modifiable variables.
