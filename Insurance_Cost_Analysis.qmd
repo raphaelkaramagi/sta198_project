@@ -50,13 +50,19 @@ insurance <- na.omit(insurance)
 ```
 
 # 1. Introduction
-Within 2023, healthcare spending in the United States increased by 7.5%, totaling to 4.9 trillion USD; this healthcare spending increase parallels increases in the cost of health insurance (American Medical Association). Recent rates of change in health insurance premium cost has exceeded that of wages and inflation, making it harder for individuals to afford health insurance. However, health insurance costs vary from one individual to another; factors such as age, location and tobacco use are legally allowed to increase the cost of one's premium. These factors can be split into two groups: modifiable lifestyle factors (MLC) and demographic/socioeconomic factors
+In 2023, healthcare spending in the United States increased by 7.5%, totaling 4.9 trillion USD [8]. This parallel increase in healthcare spending and health insurance costs has exceeded the growth rates of wages and inflation, making it increasingly difficult for individuals to afford coverage [7].
 
-From the Affordable Care Act, the five factors that effect health insurance premiums are age, location, tobacco use, individual vs family enrollment, and the plan category (Healthcare.gov). However, there could be more underlying factors that can affect the 5 stated variables. We try to fill a research gap by investigating how much premium prices can be attributed by baseline demographic/socioeconomic factors (DRF) versus modifiable lifestyle factors (MLC); does one category have a more substantial effect on insurance cost variance? The results indicate how institutions and individuals can make healthcare more affordable. For instance, if insurance cost variance is heavily driven by MLC, customers can lower prices by modifying behaviors. However, if insurance cost is heavily driven by DRF, policy changes may be required to lower costs.
+However, health insurance costs are not uniform; they vary significantly from one individual to another based on risk profiles. Legal frameworks allow insurers to adjust premiums based on specific factors such as age, location, and tobacco use [6]. Yet, individuals with pre-existing health risks or specific lifestyle habits may self-select into more expensive plans. We can broadly categorize the factors driving healthcare costs into two distinct groups: Modifiable Lifestyle Choices (MLC) (behaviors an individual can change) and Baseline Demographic/Socioeconomic Factors (DRF) (fixed characteristics).
 
-The three variables representing MLC are considered: smoking status (current, former, never), alcohol consumption frequency (never, occasionally, weekly, daily), and BMI. We consider six variables representing DRF, age, sex, highest education level, income, marital status, and household size.
+While many studies investigate these variables individually, this study attempts to fill a research gap by comparing the relative explanatory power of these two categories using a large-scale dataset. Specifically, does one category—lifestyle or demographics—have a more substantial effect on insurance cost variance? The results have implications for both policy and personal finance: if costs are driven by MLC, individuals can lower premiums by modifying behavior; if driven by DRF, systemic policy changes may be required.
 
-For our dataset, we utilize the Medical Insurance Cost Prediction dataset from Kaggle [1]. The dataset contains approximately 100,000 observations including demographic details (Age, Sex, Income) and lifestyle indicators (Smoking status, BMI, Alcohol frequency). Constituent data was derived from three main sources: Centers for Disease Control and Prevention (CDC), U.S. Department of Health & Human Services (HHS), and Centers for Medicare & Medicaid Services (CMS). 
+Data Description We utilize the Medical Insurance Cost Prediction dataset from Kaggle [1], comprising approximately 100,000 observations. The constituent data was derived from CDC, HHS, and CMS logic [1]. The response variable is the Annual Premium (USD). We analyze two sets of predictors:
+
+Modifiable Lifestyle Choices (MLC): Smoking status (Current, Former, Never), Alcohol consumption frequency, and Body Mass Index (BMI).
+
+Baseline Demographics (DRF): Age, Sex, Education level, Income, Marital Status, and Household Size.
+
+
 
 # 2. Exploratory Data Analysis
 
@@ -302,3 +308,4 @@ While Linear Regression provided clear interpretability, the heavy tails in our 
 [5] Bureau of Labor Statistics. (2023). Consumer Expenditure Survey: Health Insurance.
 [6] HealthCare.gov. (2024). How Insurance Companies Set Health Premiums. https://www.healthcare.gov/how-plans-set-your-premiums/
 [7] Kaiser Family Foundation. (2023). Employer Health Benefits Survey. https://www.kff.org/
+[8] Centers for Medicare & Medicaid Services, Office of the Actuary. “National Health Expenditure (NHE) Fact Sheet: Historical NHE, 2023.” U.S. Department of Health & Human Services
