@@ -221,7 +221,7 @@ We compared the Lifestyle-only model against the Full model to see if adding Dem
 **H(alt)**: At least one of $\beta_{Smoker},  \beta_{Alcohol},  \beta_{BMI}  ≠ 0$; additional values results in higher R2
 We compared the Demographic-only model against the Full model to see if adding Lifestyle factors improved the fit. The F-test yielded an F-statistic of 128.88 and a p-value <0.001. We reject the null hypothesis and conclude that at least one of the coefficients of MLC has a statistically significant difference from zero. This means adding the MLC variables results in a higher R2.  This confirms that modifiable choices (Smoking, BMI) also significantly explain variation in premiums.
 
-
+The ANOVA tests conclude that the addition of MLC parameters to a DRF model helps explain the variation in the log(annual premium). However, as the degrees of freedom are not the same for each ANOVA test, the F value cannot be used directly to compare the practical impact of the added variables.
 
 ## 3.3 Comparison of R² Values
 
