@@ -281,7 +281,7 @@ tidy(m3_full) |>
     term = str_replace_all(term, "bmi", "BMI"),
     term = str_replace_all(term, "age", "AGE"),
     term = str_replace_all(term, "educationHS", "Education: HS"),
-    term = str_replace_all(term, "educationSome_College", "Education: Some College"),
+    term = str_replace_all(term, "educationSome College", "Education: Some College"),
     term = str_replace_all(term, "educationBachelors", "Education: Bachelors"),
     term = str_replace_all(term, "educationMasters", "Education: Masters"),
     term = str_replace_all(term, "educationDoctorate", "Education: Doctorate"),
@@ -297,11 +297,16 @@ tidy(m3_full) |>
 
 Key Findings: 
 
-1. Smoking: Being a "Current Smoker" has a large positive coefficient ($0.221$). Holding other factors constant, current smokers pay approximately 22% more in premiums than never-smokers at the baseline age.
+1. Smoking: Being a "Current Smoker" has a large positive coefficient ($0.221$). Holding other factors constant, current smokers pay approximately 0.22 more in log(annual premiums) than never-smokers at the baseline age.
 
-2. BMI: The coefficient for BMI is positive and statistically significant ($p < 0.001$). Higher body mass index is reliably associated with higher insurance costs.
+2. BMI: The coefficient for BMI is positive and statistically significant ($p < 0.01$). The model predicts that for each increase in one BMI point, the log(annual premium) increases by 0.00562.
 
-3. Alcohol: The p-values for alcohol frequency are $> 0.05$. This suggests that, unlike smoking and BMI, self-reported alcohol frequency is not a statistically significant predictor of insurance premiums in this dataset.
+3. Alcohol: The p-values for alcohol frequency are $> 0.01$. This suggests that, unlike smoking and BMI, self-reported alcohol frequency is not a statistically significant predictor of log(annual premiums) in this dataset.
+
+4. Age: p values were  ($p < 0.01$), indicate that change in age leads to a statistically significant change in log (annual  premiums). The model predicts that for each increase in one year of age point, the log(annual premium) increases by 0.00464.
+
+5. Education: p values were  ($p > 0.01$) for all education levels. This suggests that education is not a statistically significant predictor of log(annual premiums) in this dataset. However, notably, there are significantly lower p values for associated with holding a doctorate, at 0.026, compared to other education levels which are all $> 0.05$.
+
 
 # 4. Discussion
 
