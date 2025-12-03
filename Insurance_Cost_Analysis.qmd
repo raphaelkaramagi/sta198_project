@@ -276,13 +276,12 @@ tidy(m3_full) |>
     term = str_replace_all(term, "alcohol_freqWeekly", "Alcohol: Weekly"),
     term = str_replace_all(term, "alcohol_freqOccasional", "Alcohol: Occasional"),
     term = str_replace_all(term, "alcohol_freqDaily", "Alcohol: Daily"),
-    term = str_replace_all(term, "age:smokerCurrent", "Interaction: Age * Smoker"),
-    term = str_replace_all(term, "bmi", "BMI"),
+    term = str_replace_all(term, "bmi", "BMI"), 
     estimate = round(estimate, 5),
     p.value = scales::pvalue(p.value)
   ) |>
   select(Predictor = term, Estimate = estimate, `Std. Error` = std.error, `P-Value` = p.value) |>
-  kable(caption = "Coefficients for Modifiable Lifestyle Factors (Model 2)") |>
+  kable(caption = "Coefficients for Full Model (Model 3)") |>
   kable_styling(latex_options = "hold_position")
 ```
 
