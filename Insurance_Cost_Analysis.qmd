@@ -107,9 +107,10 @@ To isolate the variance explained by lifestyle choices versus demographics, we e
 
 We fit three distinct models:
 
-Model 1: Baseline Demographics Accounts only for fixed factors the individual cannot easily change. $$ \ln(Y) = \beta_0 + \beta_{Age} + \beta_{Sex} + \beta_{Region} + \beta_{Income} + \dots + \epsilon $$
+Model 1: Baseline Demographics Accounts only for fixed factors the individual cannot easily change. $$ \ln(Y) = \beta_0 + \beta_{Age} x_{Age} + \beta_{Sex} x_{Sex} + \beta_{Region} x_{Region} + \beta_{Income} x_{Income} + \cdots + \epsilon $$
 
-Model 2: Lifestyle Only Accounts only for modifiable behaviors. $$ \ln(Y) = \beta_0 + \beta_{Smoker} + \beta_{Alcohol} + \beta_{BMI} + \epsilon $$
+Model 2: Lifestyle Only Accounts only for modifiable behaviors. $$ \ln(Y) = \ln(Y) = \beta_0 + \beta_{Smoker} x_{Smoker} + \beta_{Alcohol} x_{Alcohol} + \beta_{BMI} x_{BMI} + \epsilon
+ $$
 
 Model 3: Full Model (Demographics + Lifestyle) Combines both categories and includes the interaction term observed in EDA. $$ \ln(Y) = \text{Model 1} + \text{Model 2} + \epsilon $$
 
