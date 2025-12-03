@@ -271,7 +271,7 @@ Table 5 presents the coefficients for the Full Model. Since the response is log-
 ```{r}
 # Tidy results for the Some Key Factors
 tidy(m3_full) |>
-  filter(str_detect(term, "bmi|smoker|alcohol|age|education")) |>
+  filter(str_detect(term, "bmi|smoker|alcohol|age|education|region")) |>
   mutate(
     term = str_replace_all(term, "smokerCurrent", "Smoker: Current"),
     term = str_replace_all(term, "smokerFormer", "Smoker: Former"),
@@ -285,6 +285,10 @@ tidy(m3_full) |>
     term = str_replace_all(term, "educationBachelors", "Education: Bachelors"),
     term = str_replace_all(term, "educationMasters", "Education: Masters"),
     term = str_replace_all(term, "educationDoctorate", "Education: Doctorate"),
+    term = str_replace_all(term, "regionEast", "Region: East"),
+    term = str_replace_all(term, "regionNorth", "Region: North"),
+    term = str_replace_all(term, "regionSouth", "Region: South"),
+    term = str_replace_all(term, "regionWest", "Region: West"),
     estimate = round(estimate, 5),
     p.value = scales::pvalue(p.value)
   ) |>
@@ -297,7 +301,7 @@ tidy(m3_full) |>
 
 Key Findings: 
 
-1. Smoking: Being a "Current Smoker" has a large positive coefficient ($0.221$). Holding other factors constant, current smokers pay approximately 0.22 more in log(annual premiums) than never-smokers at the baseline age.
+1. Smoking: Being a current smoker and a former smoker has a p value that is statistically significant ($p < 0.01$). Notably a "Current Smoker" has a large positive coefficient ($0.221$). Holding other factors constant, current smokers pay approximately 0.22 more in log(annual premiums) than never-smokers at the baseline age. 
 
 2. BMI: The coefficient for BMI is positive and statistically significant ($p < 0.01$). The model predicts that for each increase in one BMI point, the log(annual premium) increases by 0.00562.
 
