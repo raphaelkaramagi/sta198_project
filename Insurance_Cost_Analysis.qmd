@@ -42,13 +42,15 @@ insurance <- insurance |>
     smoker = factor(smoker, levels = c("Never", "Former", "Current")),
     alcohol_freq = factor(alcohol_freq, levels = c("None", "Occasional", "Weekly", "Daily")),
     sex = factor(sex),
-    education = factor(education),
+    education = factor(education, levels = c("No HS", "HS", "Some College", "Bachelors", "Masters", "Doctorate")),
     marital_status = factor(marital_status),
     region = factor(region),
     urban_rural = factor(urban_rural)
   )
 
 insurance <- na.omit(insurance)
+
+glimpse(insurance)
 ```
 
 # 1. Introduction
@@ -84,8 +86,6 @@ insurance |>
   kable(caption = "Summary Statistics of Annual Premium Costs", digits = 2) |>
   kable_styling(latex_options = "hold_position")
 ```
-
-
 
 # 2. Methodology
 
@@ -162,21 +162,65 @@ grid.arrange(m1, m2, m3, ncol = 1)
 We chose Ordinary Least Squares (OLS) regression on the log-transformed outcome. OLS provides highly interpretable coefficients, allowing for the quantification the changes in premiums associated with each lifestyle and demographic variable.
 
 To ensure our results are valid, we will assess four key assumptions in the Results section:
-
 1. Linearity: The relationship between predictors and the log-response is linear
 2. Independence: We assume observations are independent (i.e., one individual's premium doesn't influence another's)
 3. Equal Variance: The variance of residuals is constant across fitted values
 4. Normality: The residuals are normally distributed
 
+Furthermore, we used ANOVA to test the demographics and modifiable groups to the full model and see its match. However, before we run ANOVA, we must check its assumptions:
+1. Normality: Satisfied for every factor because of the logged function on the annual_premium.
+2. Equal Variance:
+3. Independent: met because once again, someone's premium isn't going to affect another person's. 
+
+```{r}
+ggplot(insurance, aes(x = log(annual_premium))) + 
+  geom_histogram(bins = 25, fill = "blue", color = "white") + 
+  facet_wrap(~ education, scales = "free_y", ncol = 3) +  
+  labs(title = "Normality Check: Log(Premium) by Education Level",
+       x = "Log Annual Premium ($)",
+       y = "Count") +
+  theme_minimal()
+
+ggplot(insurance, aes(x = log(annual_premium))) + 
+  geom_histogram(bins = 25, fill = "blue", color = "white") + 
+  facet_wrap(~ smoker, scales = "free_y", ncol = 3) +  
+  labs(title = "Normality Check: Log(Premium) by Smoker Status",
+       x = "Log Annual Premium ($)",
+       y = "Count") +
+  theme_minimal()
+
+ggplot(insurance, aes(x = log(annual_premium))) + 
+  geom_histogram(bins = 25, fill = "blue", color = "white") + 
+  facet_wrap(~ alcohol_freq, scales = "free_y", ncol = 3) +  
+  labs(title = "Normality Check: Log(Premium) by Alcohol Frequency",
+       x = "Log Annual Premium ($)",
+       y = "Count") +
+  theme_minimal()
+
+ggplot(insurance, aes(x = log(annual_premium))) + 
+  geom_histogram(bins = 25, fill = "blue", color = "white") + 
+  facet_wrap(~ sex, scales = "free_y", ncol = 3) +  
+  labs(title = "Normality Check: Log(Premium) by sex",
+       x = "Log Annual Premium ($)",
+       y = "Count") +
+  theme_minimal()
+
+ggplot(insurance, aes(x = log(annual_premium))) + 
+  geom_histogram(bins = 25, fill = "blue", color = "white") + 
+  facet_wrap(~ marital_status, scales = "free_y", ncol = 3) +  
+  labs(title = "Normality Check: Log(Premium) by marital status",
+       x = "Log Annual Premium ($)",
+       y = "Count") +
+  theme_minimal()
+
+```
 # 3. Results
 
 ## 3.1 Diagnostics and Assumptions Checking
-To ensure the validity of our inference, we examined the residual plots for the full Model (Figure 3).
-
+To ensure the validity of our inference, we examined the residual plots for the full Model (Figure 3) as well as data collection procedures.
 - Linearity & Equal Variance: The Residuals vs Fitted plot (Left) shows a random cloud of points around zero with no distinct pattern (e.g., no funnel shape). This indicates that the assumptions of linearity and constant variance are reasonably satisfied.
 
-- Independence: One key source of this dataset [1] is the National Health Interview survey; this survey is conducted on a voluntary basis. Consequently, there is a self-selection bias that may affect the ability to fully assume independence for this study.
-
+- Independence: One key source of this dataset [1] is the National Health Interview survey; this survey is conducted on a voluntary basis. Consequently, there is a self-selection bias that may affect the ability to fully assume independence for this study. Further, confounding variables may exist. For instance, variables such as location may be affecting bmi and smoking.
 - Normality of Residuals: As shown earlier in the residual histograms, the normality of the residuals for each of the three models is roughly fulfilled. Further, figure 4 (Right) shows the Normal Q-Q plot for the full model. The points (circles) adhere closely to the diagonal line for the majority of observations. However, the tails deviate upward. This "heavy-tailed" behavior indicates that our model slightly underestimates the premiums for the most extreme, high-cost outliers. Given the large sample size ($N \approx 100,000$), the Central Limit Theorem ensures that our coefficient estimates remain unbiased despite this deviation [2].
 
 
@@ -194,7 +238,6 @@ plot(m3_full, which = 2, main = "Normal Q-Q")
 ```
 
 ## 3.2 ANOVA Model Comparison
-
 To test whether the addition of specific variable categories significantly improves the model, we utilized ANOVA F-tests.
 
 
@@ -210,23 +253,18 @@ anova(m2_life, m3_full) |>
   kable_styling(latex_options = "hold_position")
 ```
 
+
 **Testing the Addition of Demographic Factors**
-
-**H(null):** $\beta_{Age} = \beta_{Sex} =  \beta_{Region} = \beta_{Income} = \beta_{MaritalStatus} = \beta_{Urban/Rural} = \beta_{Education}  0$
-
-**H(alt):** At least one of  $\beta_{Age}, \beta_{Sex}, \beta_{Region}, \beta_{Income}, \beta_{MaritalStatus}, \beta_{Urban/Rural},  \beta_{Education} ≠ 0$
+**H(null):** $\beta_{Age} = \beta_{Sex} =  \beta_{Region} = \beta_{Income} = \beta_{MaritalStatus} = \beta_{Urban/Rural} = \beta_{Education}  = 0$; additional values has no effect on R2
+**H(alt):** At least one of  $\beta_{Age}, \beta_{Sex}, \beta_{Region}, \beta_{Income}, \beta_{MaritalStatus}, \beta_{Urban/Rural},  \beta_{Education} ≠ 0$ ; additional values results in higher R2
 
 
-We compared the Lifestyle-only model against the Full model to see if adding Demographics significantly reduced the squared residuals. The F-test yielded an F-statistic of 461.19 and a p-value <0.001. We reject the null hypothesis. This confirms that demographic factors (Age, Income, etc.) do provide statistically significant explanatory power.
-
+We compared the Lifestyle-only model against the Full model to see if adding Demographics significantly reduced the squared residuals. The F-test yielded an F-statistic of 461.19 and a p-value <0.001. We reject the null hypothesis and conclude that at least one of the coefficients of DRF has a statistically significant difference from zero. This means adding the DRF variables results in a higher R2. This confirms that demographic factors (Age, Income, etc.) do provide statistically significant explanatory power. 
 
 **Testing the Addition of Modifiable Lifestyle Factors** 
-
-**H(null)**: $\beta_{Smoker} = \beta_{Alcohol} =  \beta_{BMI} = 0$
-
-**H(alt)**: At least one of $\beta_{Smoker},  \beta_{Alcohol},  \beta_{BMI}  ≠ 0$
-
-We compared the Demographic-only model against the Full model to see if adding Lifestyle factors improved the fit. The F-test yielded an F-statistic of 128.88 and a p-value <0.001. We reject the null hypothesis. This confirms that modifiable choices (Smoking, BMI) also significantly explain variation in premiums.
+**H(null)**: $\beta_{Smoker} = \beta_{Alcohol} =  \beta_{BMI} = 0$; additional values has no effect on R2
+**H(alt)**: At least one of $\beta_{Smoker},  \beta_{Alcohol},  \beta_{BMI}  ≠ 0$; additional values results in higher R2
+We compared the Demographic-only model against the Full model to see if adding Lifestyle factors improved the fit. The F-test yielded an F-statistic of 128.88 and a p-value <0.001. We reject the null hypothesis and conclude that at least one of the coefficients of MLC has a statistically significant difference from zero. This means adding the MLC variables results in a higher R2.  This confirms that modifiable choices (Smoking, BMI) also significantly explain variation in premiums.
 
 The ANOVA tests conclude that the addition of MLC parameters to a DRF model helps explain the variation in the log(annual premium). However, as the degrees of freedom are not the same for each ANOVA test, the F value cannot be used directly to compare the practical impact of the added variables.
 
@@ -260,53 +298,67 @@ kable(dfr2c, caption = "ΔR\u00B2 of Demographic and Lifestyle Model Compared to
 
 The R² values are generally low across all models (0.0249 to 0.0596), indicating that the variables available in this dataset explain only a small fraction of the total variance in premiums.
 
-However, we can compare the relative impact of the two categories. Adding Lifestyle variables to the demographic model increased the R² by roughly 0.0347. Conversely, adding Demographic variables to the lifestyle model increased the R² by only 0.0255. This suggests that modifiable lifestyle factors have a stronger marginal effect on predicting insurance costs than fixed demographic factors.
+However, we can compare the relative impact of the two categories. The removal of MLC from the full model decreased the R2 by roughly 0.0347. Conversely, the removal of DRF from the full model increased the R² by only 0.0255. This suggests that modifiable lifestyle factors have a stronger marginal effect on predicting insurance costs than fixed demographic factors.
 
 
 ## 3.4 Regression Coefficients
-Table 5 presents the coefficients for the Full Model. Since the response is log-transformed, coefficients ($\beta$) can be interpreted as an approximate $100 \times \beta \%$ change in the premium for small values.
+Table 5 presents the coefficients for bmi, smoker status, alcohol usage, age, and education level for the Full Model. These coefficients were specifically included as the p values associated were surprising or significant.
 
 ```{r}
-# Tidy results for the main lifestyle factors
+# Tidy results for the Some Key Factors
 tidy(m3_full) |>
-  filter(str_detect(term, "bmi|smoker|alcohol|age:smoker")) |>
+  filter(str_detect(term, "bmi|smoker|alcohol|age|education|region")) |>
   mutate(
     term = str_replace_all(term, "smokerCurrent", "Smoker: Current"),
     term = str_replace_all(term, "smokerFormer", "Smoker: Former"),
     term = str_replace_all(term, "alcohol_freqWeekly", "Alcohol: Weekly"),
     term = str_replace_all(term, "alcohol_freqOccasional", "Alcohol: Occasional"),
     term = str_replace_all(term, "alcohol_freqDaily", "Alcohol: Daily"),
-    term = str_replace_all(term, "bmi", "BMI"), 
+    term = str_replace_all(term, "bmi", "BMI"),
+    term = str_replace_all(term, "age", "AGE"),
+    term = str_replace_all(term, "educationHS", "Education: HS"),
+    term = str_replace_all(term, "educationSome College", "Education: Some College"),
+    term = str_replace_all(term, "educationBachelors", "Education: Bachelors"),
+    term = str_replace_all(term, "educationMasters", "Education: Masters"),
+    term = str_replace_all(term, "educationDoctorate", "Education: Doctorate"),
+    term = str_replace_all(term, "regionEast", "Region: East"),
+    term = str_replace_all(term, "regionNorth", "Region: North"),
+    term = str_replace_all(term, "regionSouth", "Region: South"),
+    term = str_replace_all(term, "regionWest", "Region: West"),
     estimate = round(estimate, 5),
     p.value = scales::pvalue(p.value)
   ) |>
   select(Predictor = term, Estimate = estimate, `Std. Error` = std.error, `P-Value` = p.value) |>
-  kable(caption = "Coefficients for Full Model (Model 3)") |>
+  kable(caption = "Coefficients for MLC and DRF variables (Model 3)") |>
   kable_styling(latex_options = "hold_position")
+
+
 ```
 
 Key Findings: 
+1. Smoking: Being a current smoker and a former smoker has a p value that is statistically significant ($p < 0.01$). Notably a "Current Smoker" has a large positive coefficient ($0.221$). Holding other factors constant, current smokers pay approximately 0.22 more in log(annual premiums) than never-smokers at the baseline age. 
+2. BMI: The coefficient for BMI is positive and statistically significant ($p < 0.01$). The model predicts that for each increase in one BMI point, the log(annual premium) increases by 0.00562.
+3. Alcohol: The p-values for alcohol frequency are $> 0.01$. This suggests that, unlike smoking and BMI, self-reported alcohol frequency is not a statistically significant predictor of log(annual premiums) in this dataset.
+4. Age: p values were  ($p < 0.01$), indicating that change in age leads to a statistically significant change in log (annual  premiums). The model predicts that for each increase in one year of age point, the log(annual premium) increases by 0.00464.
+5. Education: p values were  ($p > 0.01$) for all education levels. This suggests that education is not a statistically significant predictor of log(annual premiums) in this dataset. However, notably, there are significantly lower p values associated with holding a doctorate, at 0.026, compared to other education levels which are all $> 0.05$.
+6. Region: p values were ($p > 0.01$) for all regions. This suggests that being in the north, east, south, and west does not lead to a significantly significant change in log(annual premium) compared to those who lived in central US.
 
-1. Smoking: Being a "Current Smoker" has a large positive coefficient ($0.221$). Holding other factors constant, current smokers pay approximately 22% more in premiums than never-smokers at the baseline age.
-
-2. BMI: The coefficient for BMI is positive and statistically significant ($p < 0.001$). Higher body mass index is reliably associated with higher insurance costs.
-
-3. Alcohol: The p-values for alcohol frequency are $> 0.05$. This suggests that, unlike smoking and BMI, self-reported alcohol frequency is not a statistically significant predictor of insurance premiums in this dataset.
 
 # 4. Discussion
 
-## 4.1 Interpretation of Results
-Initial analysis with hierarchical multiple linear regression reveals that lifestyle choices and demographic factors affect the log(annual insurance). However, further examination into R² values revealed that the most of the variation in log(annual insurance) could not be explained with models generated with MLC variables alone, DRF variables alone, and both MLC and DRF variables. Notably, the full model has a R² value of 0.06, indicating that 6% of the variation of the log(annual insurance) can be explained by the regression model. The DRF model has an R² value of 0.025, meaning 2.5% of the variation can be explained by the model and MLC alone has an R² value of 0.034, indicating that 3.4% of the variation can be explained by the model. 
-Comparing the change in R² value between the full vs. DRF model and full vs. MLC model. We find that the difference between the full and DRF model ( ΔR² = 0.0347) is higher than that of the difference between the full and MLC model ( ΔR² = 0.0254). This indicates that the addition of lifestyle variables to a DRF model has a greater impact in minimizing R² than adding demographic variables to an MLC model.
-The low R² value of this data indicates that a substantial amount of log(annual premium) variation is attributable to factors not present in the dataset. This may include variables such as deductible amounts, coverage levels, provider networks, and specific insurer pricing strategies.
-When observing the slope coefficients of the MLC model, we found that smoking was associated with a high slope value. Current smokers have a log(annual premium) of 0.22 higher than those who have never smoked. BMI similarly showed a positive relationship with log(annual premium), with an increase in one BMI point being associated with an increase in log(annual premium) of 0.56. In contrast with these two variables, alcohol consumption did not seem to have a significant effect on log(annual premium) due to p values (for occasional, weekly, and daily drinking) all greater than 0.01. Our findings align with the policies laid out in the affordable care act: while smoking may be used to adjust insurance cost, BMI and alcohol consumption are not considered. 
+## 4.1 Results Interpretation
+Our initial analyses using hierarchical multiple linear regression shows that the addition of modifiable lifestyle choice variables (MLC) and demographic factors (DRF) significantly affect the log(annual insurance).
+ To compare the effect of adding MLC vs. DRF, we compared the R2 values of each model. R2 values were low for the MLC model (Model 1), the DRF Model (Model 2) and full model (Model 3) at 0.06, 0.025, and 0.034 respectively. These indicated that Model 1, Model 2, and Model 3 respectively explained 3.4%, 2.5% and 3.4% of the variance in the log(annual insurance) values. The low R2 values indicates that the explanatory power of these models are therefore very minimal, and indicates that other variables not considered by this study may explain variance in the log(annual insurance).
+Further, the change in R2 value between the full vs. DRF only model and the full vs. MLC only model was at ΔR² = 0.0347 and ΔR² = 0.0254 respectively. The greater ΔR² for the full vs. MLC only model indicates that the removal of DRF variables minimized the R2 values to a greater extent than the removal of the MLC variables.
+Following this, the slope coefficients for bmi, smoker status, alcohol usage, age, and education level the full model was then analysed. Notably, we found that a non smoker, current smoker, former smoker statuses had a statistically significant effect on log(annual premium) values. Having a current smoker and former smoker status were associated with p values less than 0.01. Additionally, current smokers are associated with high slope values: the model predicts that current smokers have a log(annual premium) of 0.22 higher than those who have never smoked. BMI was also associated with a p values less than 0.01. An increase in one BMI point being associated with an was predicted to increase the log(annual premium) by 0.0056. In contrast with these two variables, alcohol consumption did not seem to have a significant effect on log(annual premium) due to p values (for occasional, weekly, and daily drinking) all greater than 0.01. Additionally, education level did not seem to have an effect on log(annual premium values) as the p values for each included education level (no hs, hs, some college, bachelors, masters, doctorate) was less than 0.01. Our findings align with the policies laid out in the affordable care act: while smoking is utilized to adjust insurance cost, alcohol consumption and education level is not considered. BMI may affect insurance costs as higher BMI may be associated with more severe health conditions. Surprisingly, while location can be considered to determine insurance costs legally, there is no statistically significant change in the log(annual premium) for those living in the north, east, west, south, compared to those who lived in the central U.S. This surprising result may warrant further exploration.,
 
-## 4.2 Methodological Limitations & Reccomendations
+## 4.2 Methodological Limitations & Recommendations
 Several issues limit the strength of these conclusions. First, some factors that are known to have been able to legally affect healthcare costs, such as plan types, are not included in the dataset. Therefore, these significant variables cannot be controlled for and cannot be assessed.  Second, some of the data sources such as the National Health Interview Survey collects self reported data. Relying upon such data for factors such as BMI, smoking and alcohol consumption may be prone to error as individuals may want to underreport such stigmatized behaviors. Third, the model underestimates premiums for the individuals paying the most for insurance, as shown in the Q-Q plot.  Fourth, as the variables selected do not represent the totality of Modifiable Lifestyle Choices and Demographics, a general conclusion about these two factors may be inappropriate. 
-To improve the study, more variables representing MLC and DRF should be included. It may also be helpful to test the interaction effects between MLC and DRF variables. Further, more categories for alcohol consumption may be helpful. Currently, there is no distinction between an individual who has quit alcohol recently and another who has quit alcohol for a long duration of time. There may exist a distinction in insurance premium between these two groups. Finally, a dataset that does not rely on self-reported data should be found.
+To improve the study, more variables representing MLC and DRF should be included. It may also be helpful to test the interaction effects between MLC and DRF variables. Further, more categories for alcohol consumption may be helpful: Currently, there is no distinction made between an individual who has quit alcohol recently and another who has quit alcohol for a long duration of time. It would seem logical that a distinction in insurance premium between these two groups may exist. Finally, a dataset that does not rely on self-reported data should be found. We also recommend greater exploration of the education status, as while all p values were greater than 0.01; the p value associated with having a doctorate was still quite low at 0.026. Further, the associated slope value with having a doctorate was somewhat high, at -0.024. Studies may also want to subdivide regions of the United States into more segments than utilized in this study (north, east, south, west, central), and investigate the more subdivided regions will have statistically significant health insurance costs.
 
 ## 4.3 Implications
-Our results reveal that lifestyle choices and demographics contribute to the cost of insurance. The addition of lifestyle choice variables seem to help explain variability in log(annual insurance cost) more significantly when demographic factors were added. Despite this, the examined variables seem to explain very little variation in log(annual insurance costs), as indicated by the low R² value. Simultaneously, this implies that other variables not investigated in this study may better explain variations in health insurance. Consequently, further study is needed into the explanatory effect of modifiable lifestyle choice variables vs. demographic variables on insurance cost.
+Our results reveal that lifestyle choices and demographics contribute to the cost of insurance. The addition of lifestyle choice variables seem to help explain variability in log(annual insurance cost) more significantly when demographic factors were added. Despite this, the examined variables seem to explain very little variation in log(annual insurance costs), as indicated by the low R2 value. Simultaneously, this implies that other variables not investigated in this study may better explain variations in health insurance. Consequently, further study is needed into the explanatory effect of modifiable lifestyle choice variables vs. demographic variables on insurance cost.
+
 
 # 5. References
 
