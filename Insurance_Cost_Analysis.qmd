@@ -87,8 +87,6 @@ insurance |>
   kable_styling(latex_options = "hold_position")
 ```
 
-
-
 # 2. Methodology
 
 ```{r}
@@ -169,6 +167,53 @@ To ensure our results are valid, we will assess four key assumptions in the Resu
 3. Equal Variance: The variance of residuals is constant across fitted values
 4. Normality: The residuals are normally distributed
 
+Furthermore, we used ANOVA to test the demographics and modifiable groups to the full model and see its match. However, before we run ANOVA, we must check its assumptions:
+1. Normality: Satisfied for every factor because of the logged function on the annual_premium.
+2. Equal Variance:
+3. Independent: met because once again, someone's premium isn't going to affect another person's. 
+
+```{r}
+ggplot(insurance, aes(x = log(annual_premium))) + 
+  geom_histogram(bins = 25, fill = "blue", color = "white") + 
+  facet_wrap(~ education, scales = "free_y", ncol = 3) +  
+  labs(title = "Normality Check: Log(Premium) by Education Level",
+       x = "Log Annual Premium ($)",
+       y = "Count") +
+  theme_minimal()
+
+ggplot(insurance, aes(x = log(annual_premium))) + 
+  geom_histogram(bins = 25, fill = "blue", color = "white") + 
+  facet_wrap(~ smoker, scales = "free_y", ncol = 3) +  
+  labs(title = "Normality Check: Log(Premium) by Smoker Status",
+       x = "Log Annual Premium ($)",
+       y = "Count") +
+  theme_minimal()
+
+ggplot(insurance, aes(x = log(annual_premium))) + 
+  geom_histogram(bins = 25, fill = "blue", color = "white") + 
+  facet_wrap(~ alcohol_freq, scales = "free_y", ncol = 3) +  
+  labs(title = "Normality Check: Log(Premium) by Alcohol Frequency",
+       x = "Log Annual Premium ($)",
+       y = "Count") +
+  theme_minimal()
+
+ggplot(insurance, aes(x = log(annual_premium))) + 
+  geom_histogram(bins = 25, fill = "blue", color = "white") + 
+  facet_wrap(~ sex, scales = "free_y", ncol = 3) +  
+  labs(title = "Normality Check: Log(Premium) by sex",
+       x = "Log Annual Premium ($)",
+       y = "Count") +
+  theme_minimal()
+
+ggplot(insurance, aes(x = log(annual_premium))) + 
+  geom_histogram(bins = 25, fill = "blue", color = "white") + 
+  facet_wrap(~ marital_status, scales = "free_y", ncol = 3) +  
+  labs(title = "Normality Check: Log(Premium) by marital status",
+       x = "Log Annual Premium ($)",
+       y = "Count") +
+  theme_minimal()
+
+```
 # 3. Results
 
 ## 3.1 Diagnostics and Assumptions Checking
