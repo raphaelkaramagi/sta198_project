@@ -121,6 +121,7 @@ While ANOVA tests for statistical significance, it does not quantify effect size
 The use of a log transformation is to address the requirement of normality in the residuals required by Least Squares Regression [2]. When a full model is fit without log, its associated residual histogram is right skewed (Figure 1). A log-transformation was applied [2] to the outcome variable: annual premium, resulting in a more symmetric residual distribution (Figure 2). Other models (DRF and MLC) also showed roughly normal distributions when log was applied to the outcome variable (Figure 2). 
 
 ```{r}
+#| label: histograms-of-residuals
 #| fig.cap: "Left: Right-skewed distribution of raw premiums. Right: Approximate normal distribution after log-transformation."
 #| fig.height: 3
 #| fig.width: 8
@@ -137,17 +138,6 @@ d2 <- ggplot(data = m3_full, mapping = aes(x = m3_full$residuals)) +
 
 grid.arrange(d1, d2, ncol = 2)
 
-d3 <- ggplot(data = m1_base, mapping = aes(x = m1_base$residuals)) + 
-  geom_histogram(bins = 50) + 
-  labs(title = "Residual: Log-Transformed (DRF)", x = "Residuals",
-       y = "count") 
-
-d4 <-  ggplot(data = m2_life, mapping = aes(x = m2_life$residuals)) + 
-  geom_histogram(bins = 50) + 
-  labs(title = "Residual: Log-Transformed (MLC)", x = "Residuals",
-       y = "count") 
-
-grid.arrange(d3, d4, ncol = 2)
 ```
 
 
