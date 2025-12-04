@@ -119,7 +119,7 @@ The use of a log transformation is to address the requirement of normality in th
 
 ```{r}
 #| label: histograms-of-residuals
-#| fig.cap: "Left: Right-skewed distribution of raw premiums. Right: Approximate normal distribution after log-transformation."
+#| fig.cap: "Left: Right-skewed distribution of raw residuals, Right: Approximate normal residual distribution after log-transformation."
 #| fig.height: 3
 #| fig.width: 8
 
@@ -170,7 +170,7 @@ To ensure the validity of our inference, we examined the residual plots for the 
 
 ```{r}
 #| label: fig-diagnostics
-#| fig.cap: "Diagnostic plots for the Full Model. Left: Residuals vs. Fitted values showing constant variance. Right: Normal Q-Q plot showing approximate normality."
+#| fig.cap: "Left: Residuals vs. Fitted values for Full Model. Center: Residuals vs. Fitted values for DRF Model. Left: Residuals vs. Fitted values for MLC Model"
 #| fig.height: 3.5
 
 par(mfrow = c(1, 3))
@@ -244,9 +244,9 @@ kable(dfr2c, caption = "Marginal Contribution to R²", digits = 4) |>
   kable_styling(latex_options = "hold_position")
 ```
 
-The R² values are generally low across all models (0.0249 to 0.0595), indicating that the variables available in this dataset explain only a small fraction of the total variance in premiums.
+The R² values are generally low across all models (0.0249 to 0.0595), indicating that the variables available in this dataset explain only a small fraction of the total variance in premiums (Table 4).
 
-However, we can also compare the relative impact of the two categories. The removal of MLC from the full model decreased the R² by roughly 0.0346. Conversely, the removal of DRF from the full model increased the R² by only 0.0254. This suggests that modifiable lifestyle factors have a stronger marginal effect on predicting insurance costs than fixed demographic factors.
+However, we can also compare the relative impact of the two categories (Table 5). The removal of MLC from the full model decreased the R² by roughly 0.0346. Conversely, the removal of DRF from the full model increased the R² by only 0.0254. This suggests that modifiable lifestyle factors have a stronger marginal effect on predicting insurance costs than fixed demographic factors.
 
 
 ## 3.4 Regression Coefficients
@@ -305,8 +305,6 @@ Initial analysis using multiple hierarchical multiple linear regression showed t
 Analysis of the regression coefficient revealed several notable pieces of information. When holding other variables constant, smoking, bmi, age, and whether the individual has earned a doctorate was associated with higher log(annual premiums). The slope value associated with smoking was high, at 0.22. As smoking and bmi are MLC variables, individuals seem to have some control in reducing their healthcare cost. Individuals interested in reducing healthcare costs can do so by reducig their BMI score and quiting smoking. Most of these results in MLC align with our expectations. The Affordable Care Act (ACA) allows smoking status to factor into healthcare costs. Further, high BMI and age can increase likelihood of other health conditions, that lead individuals to select costlier health insurance. Lower age and holding a doctorate are DRF variables associated with lower healthcare costs. Holding a doctorate may be associated with higher income compared to those without HS education, thus, perhaps leading to healthier lifestyles. Age's association with higher helthcare may indicate the need for a systemic change to make healthcare more affordable to the elderly.
 
 There is insufficient evidence to show that alcohol consumption frequency and region was associated with log(annual premiums). While this result is expected for alcohol consumption as it is not factored into insurance costs, it is surprising for region as region factors into costs [3].
-
-
 
 ## 4.2 Methodological Limitations 
 
