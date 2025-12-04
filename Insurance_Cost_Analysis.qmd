@@ -159,9 +159,9 @@ ANOVA:
 ## 3.1 Diagnostics and Assumptions Checking
 To ensure the validity of our inference, we examined the residual plots for the full Model (Figure 3), DRF model (Figure 4), and MLC Model as well as data collection procedures.  
 
-- Linearity: All three Residuals vs. Fitted plots (Left) shows points that are roughly symmetrically distributed around the x axis, indicating linearity.
+- Linearity: Linearity is satisfied for the Full and DRF model. However, in the MLC model, there is a noticeable gap in the residual plots at around the 6.3 fitting value, which technically breaks the assumption of linearity.
 
-- Equal Variance: The residuals vs. fitted plot shows that points are roughly evenly spaced out in the y direction regardless of the predicted value for DRF and full model. This indicates somewhat equal variance. For MLC a small "valey" may have resulted in less even variance for each predicted value.
+- Constant Variance: The residuals vs. fitted plot shows that points are roughly evenly spaced out in the y direction regardless of the predicted value for DRF and full model. This indicates somewhat equal variance. For MLC a small "valley" may have resulted in less even variance for each predicted value.
 
 - Independence: One key source of this dataset [4] is the National Health Interview survey; this survey is conducted on a voluntary basis. Consequently, there is a self-selection bias that may affect the ability to fully assume independence for this study. Further, confounding variables may exist. For instance, variables such as location may be affecting bmi and smoking. However, this study will assume that the effects of these factors are minimal.
 
@@ -303,16 +303,13 @@ Analysis of the regression coefficient revealed several notable pieces of inform
 There was insufficient information to show that alcohol consumption frequency and region was associated with log(annual premiums). As alcohol consumption is not allowed by the ACA to factor into insurance costs, this result is expected. The result associated with the region is surprising, as the ACA allows regional demographics to affect healthcare costs.
 
 ## 4.2 Methodological Limitations 
+
 Several issues limit the strength of these conclusions. Due to a limitation of the dataset, we are unable to consider, and hold constant, the type of insurance plan selected. This variable is allowed to insure determine cost under the ACA. Further, other variables that are associated with Modifiable Lifestyle Choices and Demographic factors, such as history of cancer and ethnicity, are not included. These missing variables may account for the low R2 values of our fitted models. Further, generalizing to all MLC and DRF in general is not reasonable.
 Second, self-reported data is utilized by the NHIS, which is a large source for datapoints in our datasets. Consequently individuals may underreport factors such as BMI, smoking and alcohol consumption due to stigmatization. As our data does not perfectly align with the assumptions for linear models, estimates may also not be fully accurate.
 
 ## 4.3 Recommendations
 
 To improve this study, more variables representing MLC and DRF should be included. It may also be helpful to test the interaction effects between MLC and DRF variables, as variables such as bmi and income may be associated. Second, a new dataset that does not rely on self reported data and includes the insurance plan of each individual should be found. Datasets that subdivide variables such as alcohol consumption and region into more categories may be helpful. There may be variations within existing categories: an individual in South Carolina versus North Carolina and an individual who quit alcohol recently versus someone who has quit a long time ago may have very different insurance premium costs.
-	
-## 4.3 Implications
-Our results reveal that lifestyle choices and demographics contribute to the cost of insurance. The addition of lifestyle choice variables seem to help explain variability in log(annual insurance cost) more significantly when demographic factors were added. Despite this, the examined variables seem to explain very little variation in log(annual insurance costs), as indicated by the low R² value. Simultaneously, this implies that other variables not investigated in this study may better explain variations in health insurance. Consequently, further study is needed into the explanatory effect of modifiable lifestyle choice variables vs. demographic variables on insurance cost.
-
 
 # 5. References
 
