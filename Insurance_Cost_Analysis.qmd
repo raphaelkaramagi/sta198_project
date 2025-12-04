@@ -125,12 +125,12 @@ The use of a log transformation is to address the requirement of normality in th
 
 d1 <- ggplot(data = p1_full, mapping = aes(x = p1_full$residuals)) + 
   geom_histogram(bins = 50) + 
-  labs(title = "Residual: Raw (Full)", x = "Residuals",
+  labs(title = "Residual: Raw (Full)", x = "Residuals of Annual Premium",
        y = "count") 
 
 d2 <- ggplot(data = m3_full, mapping = aes(x = m3_full$residuals)) + 
   geom_histogram(bins = 50) + 
-  labs(title = "Residual: Log-Transformed (Full)", x = "Residuals",
+  labs(title = "Residual: Log-Transformed (Full)", x = "Residuals of Log(Annual Premium)",
        y = "count") 
 
 grid.arrange(d1, d2, ncol = 2)
@@ -170,7 +170,7 @@ To ensure the validity of our inference, we examined the residual plots for the 
 
 ```{r}
 #| label: fig-diagnostics
-#| fig.cap: "Left: Residuals vs. Fitted values for Full Model. Center: Residuals vs. Fitted values for DRF Model. Left: Residuals vs. Fitted values for MLC Model"
+#| fig.cap: "Left: Residuals vs. Predicted Log(Annual Premium) values for Full Model. Center: Residuals vs. Predicted Log(Annual Premium) for DRF Model. Left: Residuals vs. Predicted Log(Annual Premium) for MLC Model"
 #| fig.height: 3.5
 
 par(mfrow = c(1, 3))
