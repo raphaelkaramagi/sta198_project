@@ -57,15 +57,15 @@ glimpse(insurance)
 
 # 1.1 Context and Research Question
 
-In 2023, healthcare spending in the United States increased by 7.5%, totaling 4.9 trillion USD [8]. This increase in healthcare spending paralells increases in health insurance costs. As of recent health insurance costs have exceeded the growth rates of wages and inflation, making it increasingly difficult for individuals to afford coverage [7].
+In 2023, healthcare spending in the United States increased by 7.5%, totaling 4.9 trillion USD [1]. This increase in healthcare spending paralells increases in health insurance costs. As of recent health insurance costs have exceeded the growth rates of wages and inflation, making it increasingly difficult for individuals to afford coverage [2].
 
-However, health insurance vary from individual to individual; according to the Affordable Care Act, factors such as age, location and tobacco use are legally allowed to increase the cost of one's premium [6]. Further, individuals with other pre-existing health risks may also select costlier healthcare plans. Overall, we can categorize factors that potentially drive healthcare cost into two categories: Modifiable Lifestyle Choices (MLC) (behaviors an individual can change) and Baseline Demographic/Socioeconomic Factors (DRF) (fixed characteristics).
+However, health insurance vary from individual to individual; according to the Affordable Care Act, factors such as age, location and tobacco use are legally allowed to increase the cost of one's premium [3]. Further, individuals with other pre-existing health risks may also select costlier healthcare plans. Overall, we can categorize factors that potentially drive healthcare cost into two categories: Modifiable Lifestyle Choices (MLC) (behaviors an individual can change) and Baseline Demographic/Socioeconomic Factors (DRF) (fixed characteristics).
 
 This study will attempt to compare the extent of variability attributable to each of these two categories: Does one category have a more substantial effect on insurance cost variance? The results may indicate how institutions and individuals can make healthcare more affordable. If insurance cost variance is heavily driven by MLC, customers can lower prices by modifying behaviors. However, if insurance cost is heavily driven by DRF, policy changes may be required to lower costs.
 
 Research Question: **To what extent can variation in insurance premiums be attributed to Baseline Demographic Factors (DRF) versus Modifiable Lifestyle Factors (MLC)**
 
-**Dataset:** We use the Medical Insurance Cost Prediction dataset from Kaggle [1]. The dataset contains 100,000 observations including demographics (Age, Sex, Income) and lifestyle indicators (Smoking status, BMI, Alcohol frequency). Data was derived from three main sources: Centers for Disease Control & Prevention (CDC), Department of Health & Human Services (HHS), and Centers for Medicare & Medicaid Services (CMS). The response variable is the annual healthcare premium cost.
+**Dataset:** We use the Medical Insurance Cost Prediction dataset from Kaggle [4]. The dataset contains 100,000 observations including demographics (Age, Sex, Income) and lifestyle indicators (Smoking status, BMI, Alcohol frequency). Data was derived from three main sources: Centers for Disease Control & Prevention (CDC), Department of Health & Human Services (HHS), and Centers for Medicare & Medicaid Services (CMS). The response variable is the annual healthcare premium cost.
 
 Modifiable Lifestyle Choices (MLC): Smoking status (Current, Former, Never), Alcohol consumption frequency, and Body Mass Index (BMI).
 
@@ -104,7 +104,7 @@ m2_life <- lm(log(annual_premium) ~ smoker + alcohol_freq + bmi, data = insuranc
 m3_full <- lm(log(annual_premium) ~ age + sex + education + income + marital_status + household_size + region + urban_rural + bmi + smoker + alcohol_freq, data = insurance)
 ```
 
-To compare the variance explained by lifestyle choices versus demographics, we employ Hierarchical Multiple Linear Regression [3]. This approach allows us to enter variables in blocks to determine the unique variance explained by each category. We utilize Analysis of Variance (ANOVA) using Partial F-tests to determine if the addition of a block of variables to a reduced model significantly reduces the Sum of Squared Errors (SSE) and thus R2.
+To compare the variance explained by lifestyle choices versus demographics, we employ Hierarchical Multiple Linear Regression [5]. This approach allows us to enter variables in blocks to determine the unique variance explained by each category. We utilize Analysis of Variance (ANOVA) using Partial F-tests to determine if the addition of a block of variables to a reduced model significantly reduces the Sum of Squared Errors (SSE) and thus R2.
 
 We fit three distinct models:
 
@@ -118,7 +118,7 @@ Model 3: Full Model (Demographics + Lifestyle) Combines both categories and incl
 While ANOVA tests for statistical significance, it does not quantify effect size. Therefore, we also compare the change in Adjusted R² between the partial models (DRF vs. Full and MLC vs. Full). This allows us to assess which set of variables has a more substantial practical effect on reducing the squared residuals.
 
 # 2.1 Log Transformation
-The use of a log transformation is to address the requirement of normality in the residuals required by Least Squares Regression [2]. When a full model is fit without log, its associated residual histogram is right skewed (Figure 1). A log-transformation was applied [2] to the outcome variable: annual premium, resulting in a more symmetric residual distribution (Figure 2). Other models (DRF and MLC) also showed roughly normal distributions when log was applied to the outcome variable (Figure 2). 
+The use of a log transformation is to address the requirement of normality in the residuals required by Least Squares Regression [6]. When a full model is fit without log, its associated residual histogram is right skewed (Figure 1). A log-transformation was applied [6] to the outcome variable: annual premium, resulting in a more symmetric residual distribution (Figure 2). Other models (DRF and MLC) also showed roughly normal distributions when log was applied to the outcome variable (Figure 2). 
 
 ```{r}
 #| label: histograms-of-residuals
@@ -163,7 +163,7 @@ To ensure the validity of our inference, we examined the residual plots for the 
 
 - Equal Variance: The residuals vs. fitted plot shows that points are roughly evenly spaced out in the y direction regardless of the predicted value for DRF and full model. This indicates somewhat equal variance. For MLC a small "valey" may have resulted in less even variance for each predicted value.
 
-- Independence: One key source of this dataset [1] is the National Health Interview survey; this survey is conducted on a voluntary basis. Consequently, there is a self-selection bias that may affect the ability to fully assume independence for this study. Further, confounding variables may exist. For instance, variables such as location may be affecting bmi and smoking. However, this study will assume that the effects of these factors are minimal.
+- Independence: One key source of this dataset [4] is the National Health Interview survey; this survey is conducted on a voluntary basis. Consequently, there is a self-selection bias that may affect the ability to fully assume independence for this study. Further, confounding variables may exist. For instance, variables such as location may be affecting bmi and smoking. However, this study will assume that the effects of these factors are minimal.
 
 - Normality of Residuals: As shown earlier in the residual histograms, the normality of the residuals for each of the three models is roughly fulfilled.
 
@@ -316,11 +316,10 @@ Our results reveal that lifestyle choices and demographics contribute to the cos
 
 # 5. References
 
-[1] Kaggle. (2024). Medical Insurance Cost Prediction Dataset.
-[2] Wooldridge, J. M. (2015). Introductory Econometrics.
-[3] UVa Library. (2023). Hierarchical Linear Regression. https://library.virginia.edu/data/articles/hierarchical-linear-regression
-[4] American Medical Association. (2024). National Health Expenditure Data. https://www.ama-assn.org/
-[5] Bureau of Labor Statistics. (2023). Consumer Expenditure Survey: Health Insurance.
-[6] HealthCare.gov. (2024). How Insurance Companies Set Health Premiums. https://www.healthcare.gov/how-plans-set-your-premiums/
-[7] Kaiser Family Foundation. (2023). Employer Health Benefits Survey. https://www.kff.org/
-[8] Centers for Medicare & Medicaid Services, Office of the Actuary. “National Health Expenditure (NHE) Fact Sheet: Historical NHE, 2023.” U.S. Department of Health & Human Services
+[1] Centers for Medicare & Medicaid Services, Office of the Actuary. “National Health Expenditure (NHE) Fact Sheet: Historical NHE, 2023.” U.S. Department of Health & Human Services
+[2] Kaiser Family Foundation. (2023). Employer Health Benefits Survey. https://www.kff.org/
+[3] HealthCare.gov. (2024). How Insurance Companies Set Health Premiums. https://www.healthcare.gov/how-plans-set-your-premiums/
+[4] Kaggle. (2024). Medical Insurance Cost Prediction Dataset.
+[5] UVa Library. (2023). Hierarchical Linear Regression.
+[6] Wooldridge, J. M. (2015). Introductory Econometrics.
+ https://library.virginia.edu/data/articles/hierarchical-linear-regression
