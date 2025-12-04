@@ -9,8 +9,8 @@ execute:
   echo: false
   warning: false
   message: false
-  fig.width: 4
-  fig.height: 3
+  fig.width: 3
+  fig.height: 2
 ---
 
 ```{r setup}
