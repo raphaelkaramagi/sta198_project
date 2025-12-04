@@ -170,7 +170,7 @@ To ensure the validity of our inference, we examined the residual plots for the 
 
 ```{r}
 #| label: fig-diagnostics
-#| fig.cap: "Left: Residuals vs. Predicted Log(Annual Premium) values for Full Model. Center: Residuals vs. Predicted Log(Annual Premium) for DRF Model. Left: Residuals vs. Predicted Log(Annual Premium) for MLC Model"
+#| fig.cap: "Left: Residuals vs. Predicted Values for Full Model. Center: Residuals vs. Predicted Values for DRF Model. Left: Residuals vs. Predicted Values for MLC Model"
 #| fig.height: 3.5
 
 par(mfrow = c(1, 3))
