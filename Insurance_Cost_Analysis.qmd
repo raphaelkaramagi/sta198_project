@@ -13,6 +13,9 @@ execute:
   fig.height: 2
 ---
 
+#AI Statement:
+We used AI to help suggest potential ways to compare regression models. Further, we used AI to provide us information on how we can conduct the test as well as how to format the code nicely. We also asked for potential suggestions on how we can interpret the data. 
+
 ```{r setup}
 #| include: false
 library(tidyverse)
@@ -61,7 +64,7 @@ In 2023, healthcare spending in the United States increased by 7.5%, totaling 4.
 
 However, health insurance vary from individual to individual; according to the Affordable Care Act, factors such as age, location and tobacco use are legally allowed to increase the cost of one's premium [3]. Further, individuals with other pre-existing health risks may also select costlier healthcare plans. Overall, we can categorize factors that potentially drive healthcare cost into two categories: Modifiable Lifestyle Choices (MLC) (behaviors an individual can change) and Baseline Demographic/Socioeconomic Factors (DRF) (fixed characteristics).
 
-This study will attempt to compare the extent of variability attributable to each of these two categories: Does one category have a more substantial effect on insurance cost variance? The results may indicate how institutions and individuals can make healthcare more affordable. If insurance cost variance is heavily driven by MLC, customers can lower prices by modifying behaviors. However, if insurance cost is heavily driven by DRF, policy changes may be required to lower costs.
+Many prior studies have focused on investigating singular variables while others have focused on participation in healthcare as opposed to cost. This study will attempt to compare the extent of variability in health insurance cost attributable to each of these two categories: Does one category have a more substantial effect on insurance cost variance? The results may indicate how institutions and individuals can make healthcare more affordable. If insurance cost variance is heavily driven by MLC, customers can lower prices by modifying behaviors. However, if insurance cost is heavily driven by DRF, policy changes may be required to lower costs.
 
 Research Question: **To what extent can variation in insurance premiums be attributed to Baseline Demographic Factors (DRF) versus Modifiable Lifestyle Factors (MLC)**
 
@@ -168,7 +171,7 @@ To ensure the validity of our inference, we examined the residual plots for the 
 
 - Constant Variance: The residuals vs. fitted plot shows that points are roughly evenly spaced out in the y direction regardless of the predicted value for DRF and full model (however there is a slightly large concentration of points above the x axis than below). This indicates somewhat equal variance for DRC and the full model. For MLC a small "valley" may have resulted in less even variance for each predicted value.
 
-- Independence: One key source of this dataset [4] is the National Health Interview survey; this survey is conducted on a voluntary basis. Consequently, there is a self-selection bias that may affect the ability to fully assume independence for this study. Further, confounding variables may exist. For instance, variables such as location may be affecting bmi and smoking. However, this study will assume that the effects of these factors are minimal.
+- Independence: One key source of this dataset [4] is the National Health Interview survey; this survey is conducted on a voluntary basis [7]. Consequently, there is a self-selection bias that may affect the ability to fully assume independence for this study. Further, confounding variables may exist. For instance, variables such as location may be affecting bmi and smoking. However, this study will assume that the effects of these factors are minimal.
 
 - Normality of Residuals: As shown earlier in the residual histograms, the normality of the residuals for each of the three models is roughly fulfilled.
 
@@ -307,14 +310,19 @@ Key Findings:
 
 Initial analysis using multiple hierarchical multiple linear regression showed that the addition of modifiable lifestyle choice variables (MLC) and demographic factors (DRF) significantly affect the log(annual insurance). Further, comparison of R² of MLC-only vs. full model and DRF-only vs. full model indicated that MLC variables may have a more significant impact on improving fit (by minimizing residuals squared) of the regression line.
 
-Analysis of the regression coefficient revealed several notable pieces of information. When holding other variables constant, smoking, bmi, age, and whether the individual has earned a doctorate was associated with higher log(annual premiums). The slope value associated with smoking was high, at 0.22. Most of these results align with our expectations. The Affordable Care Act (ACA) allows smoking status to factor into healthcare costs, further, high BMI and age can increase likelihood of other health conditions, leading individuals to select costlier health insurance. Holding a doctorate may be associated with higher income compared to those without HS education, thus, perhaps leading to healthier lifestyles. 
+Analysis of the regression coefficient revealed several notable pieces of information. When holding other variables constant, smoking, bmi, age, and whether the individual has earned a doctorate was associated with higher log(annual premiums). The slope value associated with smoking was high, at 0.22. As smoking and bmi are MLC variables, individuals seem to have some control in reducing their healthcare cost. Individuals interested in reducing healthcare costs can do so by reducig their BMI score and quiting smoking. 
+
+Most of these results in MLC align with our expectations. The Affordable Care Act (ACA) allows smoking status to factor into healthcare costs, further, high BMI and age can increase likelihood of other health conditions, leading individuals to select costlier health insurance. 
+
+Lower age and holding a doctorate are DRF variables associated with lower healthcare costs. Holding a doctorate may be associated with higher income compared to those without HS education, thus, perhaps leading to healthier lifestyles. Age's association with higher helthcare may indicate the need for a systemic change to make healthcare more affordable to the elderly.
 
 There was insufficient information to show that alcohol consumption frequency and region was associated with log(annual premiums). As alcohol consumption is not allowed by the ACA to factor into insurance costs, this result is expected. The result associated with the region is surprising, as the ACA allows regional demographics to affect healthcare costs.
+
 
 ## 4.2 Methodological Limitations 
 
 Several issues limit the strength of these conclusions. Due to a limitation of the dataset, we are unable to consider, and hold constant, the type of insurance plan selected. This variable is allowed to insure determine cost under the ACA. Further, other variables that are associated with Modifiable Lifestyle Choices and Demographic factors, such as history of cancer and ethnicity, are not included. These missing variables may account for the low R² values of our fitted models. Further, generalizing to all MLC and DRF in general is not reasonable.
-Second, self-reported data is utilized by the NHIS, which is a large source for datapoints in our datasets. Consequently individuals may underreport factors such as BMI, smoking and alcohol consumption due to stigmatization. As our data does not perfectly align with the assumptions for linear models, estimates may also not be fully accurate.
+Second, self-reported data is utilized by the NHIS [7], which is a large source for datapoints in our datasets. Consequently individuals may under report factors such as BMI, smoking and alcohol consumption due to stigmatization. As our data does not perfectly align with the assumptions for linear models, estimates may also not be fully accurate.
 
 ## 4.3 Recommendations
 
@@ -334,3 +342,5 @@ To improve this study, more variables representing MLC and DRF should be include
 
 [6] Wooldridge, J. M. (2015). Introductory Econometrics.
  https://library.virginia.edu/data/articles/hierarchical-linear-regression
+ 
+[7] National Center for Health Statistics. (n.d.). About NHIS. Centers for Disease Control and Prevention. https://www.cdc.gov/nchs/nhis/about/index.html 
