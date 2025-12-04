@@ -136,18 +136,6 @@ d2 <- ggplot(data = m3_full, mapping = aes(x = m3_full$residuals)) +
        y = "count") 
 
 grid.arrange(d1, d2, ncol = 2)
-
-d3 <- ggplot(data = m1_base, mapping = aes(x = m1_base$residuals)) + 
-  geom_histogram(bins = 50) + 
-  labs(title = "Residual: Log-Transformed (DRF)", x = "Residuals",
-       y = "count") 
-
-d4 <-  ggplot(data = m2_life, mapping = aes(x = m2_life$residuals)) + 
-  geom_histogram(bins = 50) + 
-  labs(title = "Residual: Log-Transformed (MLC)", x = "Residuals",
-       y = "count") 
-
-grid.arrange(d3, d4, ncol = 2)
 ```
 
 
