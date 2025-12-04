@@ -323,9 +323,14 @@ To improve this study, more variables representing MLC and DRF should be include
 # 5. References
 
 [1] Centers for Medicare & Medicaid Services, Office of the Actuary. “National Health Expenditure (NHE) Fact Sheet: Historical NHE, 2023.” U.S. Department of Health & Human Services
+
 [2] Kaiser Family Foundation. (2023). Employer Health Benefits Survey. https://www.kff.org/
+
 [3] HealthCare.gov. (2024). How Insurance Companies Set Health Premiums. https://www.healthcare.gov/how-plans-set-your-premiums/
+
 [4] Kaggle. (2024). Medical Insurance Cost Prediction Dataset.
+
 [5] UVa Library. (2023). Hierarchical Linear Regression.
+
 [6] Wooldridge, J. M. (2015). Introductory Econometrics.
  https://library.virginia.edu/data/articles/hierarchical-linear-regression
